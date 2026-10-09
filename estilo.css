@@ -1,0 +1,1778 @@
+
+/* =========================
+   CONFIGURAÇÕES GERAIS
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #08080d;
+    color: white;
+    line-height: 1.6;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    width: 100%;
+    min-height: 75px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px 7%;
+
+    background: rgba(8, 8, 13, 0.95);
+
+    border-bottom: 1px solid #1f1f2a;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: #a45cff;
+}
+
+nav {
+    display: flex;
+    gap: 28px;
+}
+
+nav a {
+    color: #c6c6d0;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: #a45cff;
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+.botao-login,
+.botao-principal,
+.botao-secundario,
+.botao-plano,
+.ver-perfil {
+    border: none;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.botao-login {
+    background: #a45cff;
+    color: white;
+    padding: 11px 20px;
+    font-weight: bold;
+}
+
+.botao-login:hover {
+    background: #8d42e8;
+    transform: translateY(-2px);
+}
+
+.botao-principal {
+    display: inline-block;
+    padding: 14px 25px;
+
+    background: #a45cff;
+    color: white;
+
+    font-weight: bold;
+}
+
+.botao-principal:hover {
+    background: #8d42e8;
+    transform: translateY(-3px);
+}
+
+.botao-secundario {
+    display: inline-block;
+    padding: 13px 25px;
+
+    border: 1px solid #3a3a48;
+
+    color: white;
+}
+
+.botao-secundario:hover {
+    border-color: #a45cff;
+    color: #a45cff;
+}
+
+
+/* =========================
+   INÍCIO
+========================= */
+
+.inicio {
+    min-height: 650px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 80px 7%;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(164, 92, 255, 0.20),
+            transparent 40%
+        );
+}
+
+.inicio-conteudo {
+    max-width: 850px;
+}
+
+.etiqueta {
+    display: inline-block;
+
+    padding: 8px 15px;
+
+    border: 1px solid #3a2452;
+
+    border-radius: 30px;
+
+    color: #c89cff;
+
+    background: #130d1b;
+
+    font-size: 13px;
+
+    margin-bottom: 25px;
+}
+
+.inicio h1 {
+    font-size: clamp(45px, 7vw, 85px);
+
+    line-height: 1.05;
+
+    margin-bottom: 25px;
+}
+
+.inicio h1 span {
+    color: #a45cff;
+}
+
+.inicio p {
+    max-width: 650px;
+
+    margin: auto;
+
+    color: #a9a9b5;
+
+    font-size: 18px;
+}
+
+.botoes-inicio {
+    margin-top: 35px;
+
+    display: flex;
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================
+   SEÇÕES
+========================= */
+
+.secao {
+    padding: 100px 7%;
+    max-width: 1250px;
+    margin: auto;
+}
+
+.titulo-secao {
+    text-align: center;
+
+    font-size: 38px;
+
+    margin-bottom: 10px;
+}
+
+.subtitulo {
+    text-align: center;
+
+    color: #8d8d99;
+
+    margin-bottom: 55px;
+}
+
+
+/* =========================
+   COMO FUNCIONA
+========================= */
+
+.passos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+.passo {
+    background: #101016;
+
+    border: 1px solid #20202a;
+
+    padding: 30px;
+
+    border-radius: 15px;
+
+    transition: 0.3s;
+}
+
+.passo:hover {
+    border-color: #8d48ed;
+
+    transform: translateY(-5px);
+}
+
+.numero {
+    color: #a45cff;
+
+    font-size: 30px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+.passo h3 {
+    margin-bottom: 10px;
+}
+
+.passo p {
+    color: #8d8d99;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   PLANOS
+========================= */
+
+.planos-secao {
+    max-width: 1300px;
+}
+
+.planos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.plano {
+    position: relative;
+
+    background: #101016;
+
+    border: 1px solid #24242f;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    transition: 0.3s;
+}
+
+.plano:hover {
+    transform: translateY(-8px);
+
+    border-color: #743cc1;
+}
+
+.plano.destaque {
+    border-color: #a45cff;
+
+    box-shadow:
+        0 0 35px rgba(164, 92, 255, 0.12);
+}
+
+.plano h3 {
+    font-size: 25px;
+
+    margin-bottom: 10px;
+}
+
+.descricao-plano {
+    color: #888894;
+
+    font-size: 14px;
+}
+
+.preco {
+    font-size: 45px;
+
+    font-weight: bold;
+
+    margin: 25px 0;
+}
+
+.preco small {
+    font-size: 15px;
+
+    color: #888894;
+}
+
+.plano ul {
+    list-style: none;
+
+    margin-bottom: 30px;
+}
+
+.plano li {
+    margin: 12px 0;
+
+    color: #b9b9c4;
+}
+
+.botao-plano {
+    width: 100%;
+
+    padding: 13px;
+
+    background: #a45cff;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+.botao-plano:hover {
+    background: #8d42e8;
+}
+
+.mais-popular {
+    position: absolute;
+
+    top: -13px;
+    right: 20px;
+
+    background: #a45cff;
+
+    padding: 5px 12px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   FILTROS
+========================= */
+
+.filtros {
+    display: flex;
+
+    gap: 15px;
+
+    max-width: 800px;
+
+    margin: 0 auto 40px;
+}
+
+.filtros input,
+.filtros select {
+    width: 100%;
+
+    background: #101016;
+
+    border: 1px solid #292936;
+
+    color: white;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    outline: none;
+}
+
+.filtros input:focus,
+.filtros select:focus {
+    border-color: #a45cff;
+}
+
+
+/* =========================
+   PERFIS
+========================= */
+
+.perfis {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+.perfil {
+    background: #101016;
+
+    border: 1px solid #22222d;
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    transition: 0.3s;
+}
+
+.perfil:hover {
+    transform: translateY(-5px);
+
+    border-color: #8d48ed;
+}
+
+.foto-perfil {
+    width: 75px;
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a45cff,
+            #4e197e
+        );
+
+    font-weight: bold;
+
+    font-size: 20px;
+}
+
+.categoria {
+    display: inline-block;
+
+    background: #1c1326;
+
+    color: #b982ff;
+
+    border-radius: 20px;
+
+    padding: 5px 10px;
+
+    font-size: 11px;
+
+    margin-bottom: 10px;
+}
+
+.perfil p {
+    color: #888894;
+
+    font-size: 13px;
+
+    margin: 10px 0 20px;
+}
+
+.ver-perfil {
+    padding: 10px 18px;
+
+    background: transparent;
+
+    border: 1px solid #393944;
+
+    color: white;
+}
+
+.ver-perfil:hover {
+    border-color: #a45cff;
+
+    color: #a45cff;
+}
+
+
+/* =========================
+   BENEFÍCIOS
+========================= */
+
+.beneficios {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+.beneficio {
+    text-align: center;
+
+    padding: 25px;
+}
+
+.icone {
+    font-size: 35px;
+
+    margin-bottom: 15px;
+}
+
+.beneficio p {
+    color: #888894;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   SOBRE
+========================= */
+
+.sobre {
+    max-width: 900px;
+
+    text-align: center;
+}
+
+.sobre p {
+    color: #9b9ba7;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   MODAIS
+========================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.82);
+
+    backdrop-filter: blur(7px);
+
+    z-index: 5000;
+}
+
+.modal.ativo {
+    display: flex;
+}
+
+.modal-caixa {
+    width: 100%;
+
+    max-width: 430px;
+
+    background: #111117;
+
+    border: 1px solid #343440;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    position: relative;
+
+    box-shadow:
+        0 20px 80px rgba(0, 0, 0, 0.5);
+
+    animation: aparecer 0.2s ease;
+}
+
+@keyframes aparecer {
+
+    from {
+        transform: scale(0.9);
+
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+
+        opacity: 1;
+    }
+}
+
+.fechar {
+    position: absolute;
+
+    right: 15px;
+    top: 10px;
+
+    border: none;
+
+    background: none;
+
+    color: #777;
+
+    font-size: 30px;
+}
+
+.fechar:hover {
+    color: #a45cff;
+}
+
+.modal-caixa h2 {
+    margin-bottom: 8px;
+}
+
+.modal-caixa > p {
+    color: #858592;
+
+    margin-bottom: 20px;
+}
+
+.modal-caixa form {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.modal-caixa label {
+    margin-bottom: 6px;
+
+    font-size: 13px;
+}
+
+.modal-caixa input {
+    padding: 13px;
+
+    margin-bottom: 17px;
+
+    background: #09090e;
+
+    border: 1px solid #2d2d38;
+
+    border-radius: 8px;
+
+    color: white;
+
+    outline: none;
+}
+
+.modal-caixa input:focus {
+    border-color: #a45cff;
+}
+
+.trocar-login {
+    text-align: center;
+
+    margin-top: 20px;
+}
+
+.trocar-login button {
+    background: none;
+
+    border: none;
+
+    color: #a45cff;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   CONTA
+========================= */
+
+.avatar-conta {
+    width: 80px;
+    height: 80px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a45cff,
+            #551f82
+        );
+
+    font-size: 25px;
+
+    font-weight: bold;
+}
+
+.modal-caixa h2,
+.modal-caixa p {
+    text-align: center;
+}
+
+.conta-opcoes {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.conta-opcoes button {
+    padding: 13px;
+
+    border-radius: 9px;
+
+    background: #1a1a22;
+
+    border: 1px solid #30303b;
+
+    color: white;
+}
+
+.conta-opcoes button:hover {
+    border-color: #a45cff;
+
+    color: #a45cff;
+}
+
+
+/* =========================
+   COMPRA
+========================= */
+
+.compra-info {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    background: #09090e;
+
+    border: 1px solid #292934;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    margin: 20px 0;
+}
+
+.compra-info span {
+    color: #a45cff;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+.aviso-compra {
+    font-size: 12px;
+
+    color: #777 !important;
+}
+
+
+/* =========================
+   RODAPÉ
+========================= */
+
+footer {
+    text-align: center;
+
+    padding: 50px 20px;
+
+    border-top: 1px solid #20202a;
+
+    color: #777;
+}
+
+footer .logo {
+    margin-bottom: 10px;
+}
+
+footer p {
+    margin: 5px;
+}
+
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 950px) {
+
+    header {
+        flex-wrap: wrap;
+
+        gap: 15px;
+    }
+
+    nav {
+        order: 3;
+
+        width: 100%;
+
+        justify-content: center;
+
+        flex-wrap: wrap;
+    }
+
+    .passos,
+    .perfis,
+    .beneficios {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .planos {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .inicio {
+        min-height: 550px;
+    }
+
+    .inicio h1 {
+        font-size: 48px;
+    }
+
+    .passos,
+    .perfis,
+    .beneficios {
+        grid-template-columns: 1fr;
+    }
+
+    .filtros {
+        flex-direction: column;
+    }
+
+    header {
+        padding: 15px 20px;
+    }
+
+    nav {
+        gap: 12px;
+    }
+
+    nav a {
+        font-size: 12px;
+    }
+
+}
+
+
+/* =========================
+   POSTS
+========================= */
+
+.area-posts {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.post {
+    background: #101016;
+
+    border: 1px solid #252531;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    transition: 0.3s;
+
+    position: relative;
+}
+
+.post:hover {
+    transform: translateY(-6px);
+
+    border-color: #a45cff;
+
+    box-shadow:
+        0 10px 35px rgba(164, 92, 255, 0.10);
+}
+
+.post-topo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.post-avatar {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a45cff,
+            #501d7d
+        );
+
+    font-weight: bold;
+}
+
+.post-autor {
+    font-weight: bold;
+}
+
+.post-categoria {
+    display: block;
+
+    color: #a45cff;
+
+    font-size: 12px;
+}
+
+.post h3 {
+    font-size: 21px;
+
+    margin-bottom: 10px;
+}
+
+.post-descricao {
+    color: #92929e;
+
+    font-size: 14px;
+
+    margin-bottom: 20px;
+}
+
+.post-contato {
+    border-top: 1px solid #252530;
+
+    padding-top: 15px;
+
+    color: #bbb;
+
+    font-size: 13px;
+}
+
+.post-contato strong {
+    color: #a45cff;
+}
+
+.sem-posts {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    padding: 60px 20px;
+
+    border: 1px dashed #343440;
+
+    border-radius: 15px;
+
+    color: #777;
+}
+
+.icone-post {
+    font-size: 40px;
+
+    margin-bottom: 15px;
+}
+
+.sem-posts h3 {
+    color: white;
+
+    margin-bottom: 5px;
+}
+
+
+/* =========================
+   FORMULÁRIO DO POST
+========================= */
+
+.post-caixa {
+    max-width: 550px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+}
+
+.modal-caixa textarea,
+.modal-caixa select {
+    padding: 13px;
+
+    margin-bottom: 17px;
+
+    background: #09090e;
+
+    border: 1px solid #2d2d38;
+
+    border-radius: 8px;
+
+    color: white;
+
+    outline: none;
+
+    resize: vertical;
+}
+
+.modal-caixa textarea {
+    min-height: 120px;
+}
+
+.modal-caixa textarea:focus,
+.modal-caixa select:focus {
+    border-color: #a45cff;
+}
+
+.modal-caixa select option {
+    background: #111117;
+}
+
+
+/* =========================
+   RESPONSIVO DOS POSTS
+========================= */
+
+@media (max-width: 950px) {
+
+    .area-posts {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .area-posts {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================
+   NÍVEIS DOS PLANOS
+========================= */
+
+.nivel-plano {
+    display: inline-block;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+
+    color: #a45cff;
+
+    background: #1a1025;
+
+    border: 1px solid #38224d;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    margin-bottom: 15px;
+}
+
+
+/* =========================
+   RECURSOS
+========================= */
+
+.recursos-plano {
+    margin: 25px 0;
+}
+
+.recurso {
+    font-size: 14px;
+
+    padding: 7px 0;
+
+    border-bottom: 1px solid #1d1d26;
+}
+
+.recurso.liberado {
+    color: #d1d1da;
+}
+
+.recurso.bloqueado {
+    color: #555560;
+}
+
+
+/* =========================
+   PREMIUM
+========================= */
+
+.plano.premium {
+    border-color: #6336a0;
+}
+
+.plano.premium:hover {
+    border-color: #b36cff;
+
+    box-shadow:
+        0 0 35px rgba(164, 92, 255, 0.15);
+}
+
+
+/* =========================
+   PLANO ATUAL
+========================= */
+
+.plano-atual {
+    margin-top: 25px;
+
+    padding: 18px;
+
+    border-radius: 12px;
+
+    background: #0a0a0f;
+
+    border: 1px solid #2c2c38;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.plano-atual span {
+    color: #888894;
+
+    font-size: 13px;
+}
+
+.plano-atual strong {
+    color: #a45cff;
+
+    font-size: 16px;
+}
+
+
+/* =========================
+   RECURSOS DA CONTA
+========================= */
+
+.recursos-conta {
+    margin-top: 25px;
+}
+
+.recursos-conta h3 {
+    font-size: 15px;
+
+    margin-bottom: 12px;
+}
+
+.recurso-conta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px 0;
+
+    font-size: 13px;
+
+    color: #bdbdc8;
+}
+
+.recurso-conta.ativo {
+    color: #d9c2ff;
+}
+
+.recurso-conta.bloqueado {
+    color: #555560;
+}
+
+
+/* =========================
+   CONTA MAIOR
+========================= */
+
+.conta-caixa {
+    max-width: 480px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+}
+
+
+/* =====================================
+   IMPULSO MKT - SISTEMA MINHA CONTA
+===================================== */
+
+.conta-caixa,
+.formulario-conta {
+    position: relative;
+    box-sizing: border-box;
+    width: calc(100% - 30px);
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    border: 1px solid #30243e;
+    border-radius: 18px;
+    background: #101016;
+    color: #f4f0fa;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.conta-cabecalho {
+    text-align: center;
+    padding: 10px 0 22px;
+}
+
+.avatar-conta {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 3px solid #a45cff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a45cff, #501d7d);
+    background-position: center;
+    background-size: cover;
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.conta-cabecalho h2 {
+    margin: 0 0 6px;
+}
+
+.conta-cabecalho p,
+.formulario-conta > p {
+    color: #9895a5;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.botao-foto {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 9px 16px;
+    border: 1px solid #a45cff;
+    border-radius: 8px;
+    color: #d4b8ff;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.botao-foto:hover {
+    background: #a45cff;
+    color: white;
+}
+
+.plano-atual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 17px;
+    border: 1px solid #3b2850;
+    border-radius: 12px;
+    background: #191020;
+}
+
+.plano-atual span {
+    color: #a8a1b4;
+    font-size: 13px;
+}
+
+.plano-atual strong {
+    color: #c59aff;
+    font-size: 15px;
+}
+
+.perfil-informacoes {
+    margin-top: 22px;
+    padding: 18px;
+    border: 1px solid #292936;
+    border-radius: 12px;
+    background: #0c0c12;
+}
+
+.perfil-informacoes h3,
+.recursos-conta h3 {
+    margin: 0 0 14px;
+    font-size: 16px;
+}
+
+.perfil-informacoes p {
+    margin: 10px 0;
+    color: #bdb8c9;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.perfil-informacoes p strong {
+    color: #c59aff;
+}
+
+.botao-secundario {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #7542a4;
+    border-radius: 8px;
+    background: transparent;
+    color: #d4b8ff;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.botao-secundario:hover {
+    background: #251532;
+    border-color: #a45cff;
+}
+
+.recursos-conta {
+    margin-top: 25px;
+}
+
+.recurso-conta {
+    padding: 9px 0;
+    border-bottom: 1px solid #24222c;
+    color: #bdb8c9;
+    font-size: 13px;
+}
+
+.recurso-conta.ativo {
+    color: #d7bdff;
+}
+
+.recurso-conta.bloqueado {
+    color: #77717f;
+}
+
+.conta-opcoes {
+    display: grid;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.conta-opcoes button {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #2b2935;
+    border-radius: 9px;
+    background: #17151e;
+    color: #eee8f7;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.conta-opcoes button:hover {
+    border-color: #a45cff;
+    background: #251532;
+    transform: translateY(-1px);
+}
+
+/* Formulários */
+
+.formulario-conta h2 {
+    margin-top: 10px;
+    margin-bottom: 8px;
+}
+
+.formulario-conta label {
+    display: block;
+    margin: 15px 0 7px;
+    color: #d9d3e4;
+    font-size: 13px;
+}
+
+.formulario-conta input,
+.formulario-conta select,
+.formulario-conta textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #34313f;
+    border-radius: 8px;
+    outline: none;
+    background: #09090e;
+    color: white;
+    font: inherit;
+    font-size: 14px;
+}
+
+.formulario-conta input:focus,
+.formulario-conta select:focus,
+.formulario-conta textarea:focus {
+    border-color: #a45cff;
+    box-shadow: 0 0 0 2px rgba(164, 92, 255, 0.12);
+}
+
+.formulario-conta textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.formulario-conta .botao-principal {
+    width: 100%;
+    margin-top: 20px;
+}
+
+@media (max-width: 500px) {
+    .conta-caixa,
+    .formulario-conta {
+        padding: 22px;
+    }
+
+    .plano-atual {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* =================================
+   POSTS - IMPULSO MKT
+================================= */
+
+.area-posts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.post {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: 20px;
+    border: 1px solid #292936;
+    border-radius: 16px;
+    background: #101016;
+    transition: 0.25s;
+}
+
+.post:hover {
+    transform: translateY(-4px);
+    border-color: #7443a5;
+}
+
+.post-imagem {
+    display: block;
+    width: 100%;
+    height: 190px;
+    margin-bottom: 17px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #1a1720;
+}
+
+.post-topo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.post-avatar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a45cff, #501d7d);
+    color: white;
+    font-weight: bold;
+}
+
+.post-autor {
+    color: white;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.post-categoria {
+    display: block;
+    margin-top: 4px;
+    color: #b991f5;
+    font-size: 12px;
+}
+
+.post h3 {
+    margin: 12px 0;
+    color: #f5f0fa;
+    font-size: 20px;
+    overflow-wrap: anywhere;
+}
+
+.post-descricao {
+    color: #aaa6b5;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.post-plano {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.7px;
+}
+
+.post-basico .post-plano {
+    color: #c8c5d0;
+    background: #292832;
+}
+
+.post-destaque {
+    border: 1px solid #8b4bcb;
+    box-shadow: 0 0 20px rgba(164, 92, 255, 0.08);
+}
+
+.post-destaque .post-plano {
+    color: #e1c5ff;
+    background: #321b48;
+}
+
+.post-premium {
+    border: 1px solid #bd8aff;
+    background: linear-gradient(160deg, #1b1126, #101016 60%);
+    box-shadow: 0 0 25px rgba(164, 92, 255, 0.13);
+}
+
+.post-premium .post-plano {
+    color: white;
+    background: linear-gradient(90deg, #8a42c7, #5a258b);
+}
+
+.post-estatisticas {
+    margin-top: 18px;
+    padding-top: 13px;
+    border-top: 1px solid #2b2934;
+    color: #aaa6b5;
+    font-size: 12px;
+}
+
+.post-acoes {
+    display: grid;
+    gap: 9px;
+    margin-top: 15px;
+}
+
+.post-acoes button,
+.post-acoes a {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #393243;
+    border-radius: 8px;
+    background: #1a1720;
+    color: #eee6f7;
+    font: inherit;
+    font-size: 13px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.post-acoes button:hover,
+.post-acoes a:hover {
+    border-color: #a45cff;
+    background: #2a1939;
+}
+
+.post-acoes .post-whatsapp {
+    border-color: #366e4b;
+    background: #143321;
+    color: #a9f3c0;
+}
+
+.post-acoes .post-excluir {
+    color: #ff9b9b;
+}
+
+.post-acoes .post-whatsapp:hover {
+    background: #1b4a2e;
+}
+
+.preview-imagem-post img {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    margin: 0 0 18px;
+    border-radius: 10px;
+    object-fit: contain;
+    background: #09090e;
+}
+
+.sem-posts {
+    grid-column: 1 / -1;
+    padding: 55px 20px;
+    border: 1px dashed #393243;
+    border-radius: 15px;
+    color: #8e899a;
+    text-align: center;
+}
+
+.sem-posts h3 {
+    margin: 12px 0;
+    color: white;
+}
+
+.sem-posts .icone-post {
+    font-size: 38px;
+}
+
+@media (max-width: 950px) {
+    .area-posts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .area-posts {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* Indicadores dos planos */
+.plano-basico {
+    border-left: 4px solid #777;
+}
+
+.plano-destaque {
+    border-left: 4px solid #9333ea;
+    box-shadow: 0 0 12px rgba(147, 51, 234, 0.16);
+}
+
+.plano-premium {
+    border: 1px solid #c084fc;
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.25);
+}
+
+/* Painel de recursos */
+.painel-plano {
+    background: #17131f;
+    color: #f5f3ff;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.lista-recursos p {
+    padding: 10px;
+    border-radius: 8px;
+    background: #241b30;
+}
+
+.recurso-bloqueado {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.aviso-plano {
+    display: block;
+    margin-top: 5px;
+    color: #d8b4fe;
+    font-size: 12px;
+}

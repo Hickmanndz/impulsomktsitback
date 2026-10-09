@@ -1,0 +1,3237 @@
+
+/* =====================================================
+   IMPULSO MKT
+   SISTEMA DE PLANOS E RECURSOS
+===================================================== */
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const abrirLogin =
+    document.getElementById("abrirLogin");
+
+const modalLogin =
+    document.getElementById("modalLogin");
+
+const modalCadastro =
+    document.getElementById("modalCadastro");
+
+const modalConta =
+    document.getElementById("modalConta");
+
+const modalCompra =
+    document.getElementById("modalCompra");
+
+const modalPerfil =
+    document.getElementById("modalPerfil");
+
+const modalPost =
+    document.getElementById("modalPost");
+
+
+const fecharLogin =
+    document.getElementById("fecharLogin");
+
+const fecharCadastro =
+    document.getElementById("fecharCadastro");
+
+const fecharConta =
+    document.getElementById("fecharConta");
+
+const fecharCompra =
+    document.getElementById("fecharCompra");
+
+const fecharPerfil =
+    document.getElementById("fecharPerfil");
+
+const fecharPost =
+    document.getElementById("fecharPost");
+
+
+const formLogin =
+    document.getElementById("formLogin");
+
+const formCadastro =
+    document.getElementById("formCadastro");
+
+const formPost =
+    document.getElementById("formPost");
+
+
+const abrirCadastro =
+    document.getElementById("abrirCadastro");
+
+const botaoSair =
+    document.getElementById("botaoSair");
+
+const botaoCriarPost =
+    document.getElementById("botaoCriarPost");
+
+const botaoMeusPosts =
+    document.getElementById("botaoMeusPosts");
+
+const botaoMudarPlano =
+    document.getElementById("botaoMudarPlano");
+
+const confirmarCompra =
+    document.getElementById("confirmarCompra");
+
+
+const pesquisa =
+    document.getElementById("pesquisa");
+
+const filtroCategoria =
+    document.getElementById("filtroCategoria");
+
+
+const areaPosts =
+    document.getElementById("areaPosts");
+
+const semPosts =
+    document.getElementById("semPosts");
+
+
+/* =====================================================
+   DADOS
+===================================================== */
+
+let usuarios =
+    JSON.parse(
+        localStorage.getItem(
+            "impulsoUsuarios"
+        )
+    ) || [];
+
+
+let posts =
+    JSON.parse(
+        localStorage.getItem(
+            "impulsoPosts"
+        )
+    ) || [];
+
+
+let usuarioLogado =
+    JSON.parse(
+        localStorage.getItem(
+            "impulsoUsuarioLogado"
+        )
+    ) || null;
+
+
+/* =====================================================
+   CONFIGURAÇÃO DOS PLANOS
+===================================================== */
+
+const planos = {
+
+    "Básico": {
+
+        preco: 10,
+
+        limitePosts: 3,
+
+        destaque: false,
+
+        prioridade: false,
+
+        selo: false,
+
+        premium: false,
+
+        descricao:
+            "Plano inicial para começar sua divulgação."
+
+    },
+
+
+    "Destaque": {
+
+        preco: 20,
+
+        limitePosts: 10,
+
+        destaque: true,
+
+        prioridade: true,
+
+        selo: true,
+
+        premium: false,
+
+        descricao:
+            "Mais visibilidade e prioridade."
+
+    },
+
+
+    "Premium": {
+
+        preco: 40,
+
+        limitePosts: Infinity,
+
+        destaque: true,
+
+        prioridade: true,
+
+        selo: true,
+
+        premium: true,
+
+        descricao:
+            "Máxima exposição para seu trabalho."
+
+    }
+
+};
+
+
+/* =====================================================
+   MODAIS
+===================================================== */
+
+function abrirModal(modal) {
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.add("ativo");
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+function fecharModal(modal) {
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove("ativo");
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+abrirLogin.addEventListener(
+    "click",
+    function () {
+
+        if (usuarioLogado) {
+
+            atualizarConta();
+
+            abrirModal(modalConta);
+
+        } else {
+
+            abrirModal(modalLogin);
+
+        }
+
+    }
+);
+
+
+fecharLogin.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(modalLogin);
+
+    }
+);
+
+
+/* =====================================================
+   CADASTRO
+===================================================== */
+
+abrirCadastro.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(modalLogin);
+
+        abrirModal(modalCadastro);
+
+    }
+);
+
+
+fecharCadastro.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(modalCadastro);
+
+    }
+);
+
+
+formCadastro.addEventListener(
+    "submit",
+    function (evento) {
+
+        evento.preventDefault();
+
+
+        const nome =
+            document
+            .getElementById("cadastroNome")
+            .value
+            .trim();
+
+
+        const email =
+            document
+            .getElementById("cadastroEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+        const senha =
+            document
+            .getElementById("cadastroSenha")
+            .value;
+
+
+        const confirmar =
+            document
+            .getElementById("cadastroConfirmar")
+            .value;
+
+
+        if (senha.length < 4) {
+
+            alert(
+                "A senha precisa ter pelo menos 4 caracteres."
+            );
+
+            return;
+
+        }
+
+
+        if (senha !== confirmar) {
+
+            alert(
+                "As senhas não são iguais."
+            );
+
+            return;
+
+        }
+
+
+        const existe =
+            usuarios.find(
+                function (usuario) {
+
+                    return (
+                        usuario.email ===
+                        email
+                    );
+
+                }
+            );
+
+
+        if (existe) {
+
+            alert(
+                "Este e-mail já está cadastrado."
+            );
+
+            return;
+
+        }
+
+
+        const novoUsuario = {
+
+            id: Date.now(),
+
+            nome: nome,
+
+            email: email,
+
+            senha: senha,
+
+            plano: null
+
+        };
+
+
+        usuarios.push(
+            novoUsuario
+        );
+
+
+        salvarUsuarios();
+
+
+        usuarioLogado =
+            novoUsuario;
+
+
+        salvarUsuarioLogado();
+
+
+        formCadastro.reset();
+
+
+        fecharModal(
+            modalCadastro
+        );
+
+
+        atualizarInterface();
+
+
+        alert(
+            "Conta criada com sucesso!"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+formLogin.addEventListener(
+    "submit",
+    function (evento) {
+
+        evento.preventDefault();
+
+
+        const email =
+            document
+            .getElementById("loginEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+        const senha =
+            document
+            .getElementById("loginSenha")
+            .value;
+
+
+        const usuario =
+            usuarios.find(
+                function (item) {
+
+                    return (
+                        item.email ===
+                        email &&
+                        item.senha ===
+                        senha
+                    );
+
+                }
+            );
+
+
+        if (!usuario) {
+
+            alert(
+                "E-mail ou senha incorretos."
+            );
+
+            return;
+
+        }
+
+
+        usuarioLogado =
+            usuario;
+
+
+        salvarUsuarioLogado();
+
+
+        formLogin.reset();
+
+
+        fecharModal(
+            modalLogin
+        );
+
+
+        atualizarInterface();
+
+
+        alert(
+            "Login realizado com sucesso!"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   SALVAR
+===================================================== */
+
+function salvarUsuarios() {
+
+    localStorage.setItem(
+        "impulsoUsuarios",
+        JSON.stringify(
+            usuarios
+        )
+    );
+
+}
+
+
+function salvarUsuarioLogado() {
+
+    localStorage.setItem(
+        "impulsoUsuarioLogado",
+        JSON.stringify(
+            usuarioLogado
+        )
+    );
+
+}
+
+
+/* =====================================================
+   INTERFACE
+===================================================== */
+
+function atualizarInterface() {
+
+    if (usuarioLogado) {
+
+        abrirLogin.textContent =
+            "Minha conta";
+
+    } else {
+
+        abrirLogin.textContent =
+            "Entrar";
+
+    }
+
+}
+
+
+/* =====================================================
+   OBTER PLANO
+===================================================== */
+
+function obterPlano() {
+
+    if (
+        !usuarioLogado ||
+        !usuarioLogado.plano
+    ) {
+
+        return null;
+
+    }
+
+
+    return planos[
+        usuarioLogado.plano
+    ];
+
+}
+
+
+/* =====================================================
+   CONTA
+===================================================== */
+
+function atualizarConta() {
+
+    if (!usuarioLogado) {
+        return;
+    }
+
+
+    document.getElementById(
+        "nomeConta"
+    ).textContent =
+        usuarioLogado.nome;
+
+
+    document.getElementById(
+        "emailConta"
+    ).textContent =
+        usuarioLogado.email;
+
+
+    document.getElementById(
+        "avatarConta"
+    ).textContent =
+        usuarioLogado.nome
+        .charAt(0)
+        .toUpperCase();
+
+
+    const nomePlano =
+        document.getElementById(
+            "nomePlanoAtual"
+        );
+
+
+    const listaRecursos =
+        document.getElementById(
+            "listaRecursos"
+        );
+
+
+    const plano =
+        obterPlano();
+
+
+    /* SEM PLANO */
+
+    if (!plano) {
+
+        nomePlano.textContent =
+            "Sem plano";
+
+
+        listaRecursos.innerHTML = `
+
+            <div class="recurso-conta bloqueado">
+                🔒 Criação de posts
+            </div>
+
+            <div class="recurso-conta bloqueado">
+                🔒 Destaque nas buscas
+            </div>
+
+            <div class="recurso-conta bloqueado">
+                🔒 Selo de destaque
+            </div>
+
+            <div class="recurso-conta bloqueado">
+                🔒 Recursos Premium
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    nomePlano.textContent =
+        usuarioLogado.plano;
+
+
+    let limiteTexto;
+
+
+    if (
+        plano.limitePosts ===
+        Infinity
+    ) {
+
+        limiteTexto =
+            "Posts ilimitados";
+
+    } else {
+
+        limiteTexto =
+            "Até " +
+            plano.limitePosts +
+            " posts";
+
+    }
+
+
+    listaRecursos.innerHTML = `
+
+        <div class="recurso-conta ativo">
+            ✓ ${limiteTexto}
+        </div>
+
+        <div class="recurso-conta ativo">
+            ✓ Perfil público
+        </div>
+
+        <div class="recurso-conta ativo">
+            ✓ Informações de contato
+        </div>
+
+        <div class="recurso-conta ${
+            plano.destaque
+            ? "ativo"
+            : "bloqueado"
+        }">
+
+            ${
+                plano.destaque
+                ? "✓"
+                : "🔒"
+            }
+
+            Destaque nas buscas
+
+        </div>
+
+        <div class="recurso-conta ${
+            plano.selo
+            ? "ativo"
+            : "bloqueado"
+        }">
+
+            ${
+                plano.selo
+                ? "✓"
+                : "🔒"
+            }
+
+            Selo de destaque
+
+        </div>
+
+        <div class="recurso-conta ${
+            plano.premium
+            ? "ativo"
+            : "bloqueado"
+        }">
+
+            ${
+                plano.premium
+                ? "✓"
+                : "🔒"
+            }
+
+            Recursos Premium
+
+        </div>
+
+    `;
+
+}
+
+
+fecharConta.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(
+            modalConta
+        );
+
+    }
+);
+
+
+/* =====================================================
+   SAIR
+===================================================== */
+
+botaoSair.addEventListener(
+    "click",
+    function () {
+
+        usuarioLogado = null;
+
+
+        localStorage.removeItem(
+            "impulsoUsuarioLogado"
+        );
+
+
+        atualizarInterface();
+
+
+        fecharModal(
+            modalConta
+        );
+
+
+        alert(
+            "Você saiu da conta."
+        );
+
+    }
+);
+
+
+/* =====================================================
+   MUDAR DE PLANO
+===================================================== */
+
+botaoMudarPlano.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(
+            modalConta
+        );
+
+
+        document
+            .getElementById(
+                "planos"
+            )
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+    }
+);
+
+
+/* =====================================================
+   COMPRAR PLANO
+===================================================== */
+
+const botoesPlanos =
+    document.querySelectorAll(
+        ".botao-plano"
+    );
+
+
+botoesPlanos.forEach(
+    function (botao) {
+
+        botao.addEventListener(
+            "click",
+            function () {
+
+                if (!usuarioLogado) {
+
+                    alert(
+                        "Entre ou crie uma conta primeiro."
+                    );
+
+                    abrirModal(
+                        modalLogin
+                    );
+
+                    return;
+
+                }
+
+
+                const plano =
+                    botao.getAttribute(
+                        "data-plano"
+                    );
+
+
+                const preco =
+                    botao.getAttribute(
+                        "data-preco"
+                    );
+
+
+                document.getElementById(
+                    "planoEscolhido"
+                ).textContent =
+                    "Plano " +
+                    plano;
+
+
+                document.getElementById(
+                    "precoEscolhido"
+                ).textContent =
+                    "R$" +
+                    preco +
+                    "/mês";
+
+
+                confirmarCompra.dataset.plano =
+                    plano;
+
+
+                confirmarCompra.dataset.preco =
+                    preco;
+
+
+                abrirModal(
+                    modalCompra
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   FECHAR COMPRA
+===================================================== */
+
+fecharCompra.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(
+            modalCompra
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CONFIRMAR PLANO
+===================================================== */
+
+confirmarCompra.addEventListener(
+    "click",
+    function () {
+
+        const novoPlano =
+            confirmarCompra.dataset.plano;
+
+
+        if (!usuarioLogado) {
+
+            fecharModal(
+                modalCompra
+            );
+
+            abrirModal(
+                modalLogin
+            );
+
+            return;
+
+        }
+
+
+        usuarioLogado.plano =
+            novoPlano;
+
+
+        const indice =
+            usuarios.findIndex(
+                function (usuario) {
+
+                    return (
+                        usuario.id ===
+                        usuarioLogado.id
+                    );
+
+                }
+            );
+
+
+        if (indice !== -1) {
+
+            usuarios[indice] =
+                usuarioLogado;
+
+        }
+
+
+        salvarUsuarios();
+
+        salvarUsuarioLogado();
+
+
+        fecharModal(
+            modalCompra
+        );
+
+
+        alert(
+            "Seu plano agora é " +
+            novoPlano +
+            "!"
+        );
+
+
+        atualizarConta();
+
+    }
+);
+
+
+/* =====================================================
+   CRIAR POST
+===================================================== */
+
+botaoCriarPost.addEventListener(
+    "click",
+    function () {
+
+        if (!usuarioLogado) {
+
+            fecharModal(
+                modalConta
+            );
+
+            abrirModal(
+                modalLogin
+            );
+
+            return;
+
+        }
+
+
+        const plano =
+            obterPlano();
+
+
+        if (!plano) {
+
+            alert(
+                "Escolha um plano antes de criar seu post."
+            );
+
+            fecharModal(
+                modalConta
+            );
+
+
+            document
+                .getElementById(
+                    "planos"
+                )
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+
+            return;
+
+        }
+
+
+        /*
+           VERIFICAR LIMITE DE POSTS
+        */
+
+        const meusPosts =
+            posts.filter(
+                function (post) {
+
+                    return (
+                        post.usuarioId ===
+                        usuarioLogado.id
+                    );
+
+                }
+            );
+
+
+        if (
+            meusPosts.length >=
+            plano.limitePosts
+        ) {
+
+            alert(
+                "Você atingiu o limite de " +
+                plano.limitePosts +
+                " posts do seu plano.\n\n" +
+                "Mude de plano para publicar mais."
+            );
+
+            return;
+
+        }
+
+
+        fecharModal(
+            modalConta
+        );
+
+
+        abrirModal(
+            modalPost
+        );
+
+    }
+);
+
+
+/* =====================================================
+   FECHAR POST
+===================================================== */
+
+fecharPost.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(
+            modalPost
+        );
+
+    }
+);
+
+
+/* =====================================================
+   PUBLICAR POST
+===================================================== */
+
+formPost.addEventListener(
+    "submit",
+    function (evento) {
+
+        evento.preventDefault();
+
+
+        if (!usuarioLogado) {
+
+            return;
+
+        }
+
+
+        const plano =
+            obterPlano();
+
+
+        if (!plano) {
+
+            alert(
+                "Você precisa ter um plano."
+            );
+
+            return;
+
+        }
+
+
+        const meusPosts =
+            posts.filter(
+                function (post) {
+
+                    return (
+                        post.usuarioId ===
+                        usuarioLogado.id
+                    );
+
+                }
+            );
+
+
+        if (
+            meusPosts.length >=
+            plano.limitePosts
+        ) {
+
+            alert(
+                "Limite de posts atingido."
+            );
+
+            return;
+
+        }
+
+
+        const nome =
+            document
+            .getElementById(
+                "postNome"
+            )
+            .value
+            .trim();
+
+
+        const categoria =
+            document
+            .getElementById(
+                "postCategoria"
+            )
+            .value;
+
+
+        const titulo =
+            document
+            .getElementById(
+                "postTitulo"
+            )
+            .value
+            .trim();
+
+
+        const descricao =
+            document
+            .getElementById(
+                "postDescricao"
+            )
+            .value
+            .trim();
+
+
+        const contato =
+            document
+            .getElementById(
+                "postContato"
+            )
+            .value
+            .trim();
+
+
+        const novoPost = {
+
+            id: Date.now(),
+
+            usuarioId:
+                usuarioLogado.id,
+
+            nome:
+                nome,
+
+            categoria:
+                categoria,
+
+            titulo:
+                titulo,
+
+            descricao:
+                descricao,
+
+            contato:
+                contato,
+
+            plano:
+                usuarioLogado.plano,
+
+            destaque:
+                plano.destaque,
+
+            premium:
+                plano.premium,
+
+            data:
+                new Date()
+                .toLocaleDateString(
+                    "pt-BR"
+                )
+
+        };
+
+
+        posts.push(
+            novoPost
+        );
+
+
+        localStorage.setItem(
+            "impulsoPosts",
+            JSON.stringify(
+                posts
+            )
+        );
+
+
+        formPost.reset();
+
+
+        fecharModal(
+            modalPost
+        );
+
+
+        mostrarPosts();
+
+
+        document
+            .getElementById(
+                "posts"
+            )
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+
+        alert(
+            "Post publicado com sucesso!"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   MOSTRAR POSTS
+===================================================== */
+
+function mostrarPosts() {
+
+    const postsExistentes =
+        areaPosts.querySelectorAll(
+            ".post"
+        );
+
+
+    postsExistentes.forEach(
+        function (post) {
+
+            post.remove();
+
+        }
+    );
+
+
+    if (posts.length === 0) {
+
+        semPosts.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    semPosts.style.display =
+        "none";
+
+
+    /*
+       PRIMEIRO OS POSTS PREMIUM,
+       DEPOIS DESTAQUE,
+       DEPOIS BÁSICO
+    */
+
+    const postsOrdenados =
+        [...posts].sort(
+            function (a, b) {
+
+                if (
+                    a.premium &&
+                    !b.premium
+                ) {
+
+                    return -1;
+
+                }
+
+
+                if (
+                    a.destaque &&
+                    !b.destaque
+                ) {
+
+                    return -1;
+
+                }
+
+
+                return 0;
+
+            }
+        );
+
+
+    postsOrdenados.forEach(
+        function (post) {
+
+            const elemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            elemento.className =
+                "post";
+
+
+            /*
+               CLASSES DO PLANO
+            */
+
+            if (post.premium) {
+
+                elemento.classList.add(
+                    "post-premium"
+                );
+
+            } else if (
+                post.destaque
+            ) {
+
+                elemento.classList.add(
+                    "post-destaque"
+                );
+
+            }
+
+
+            const iniciais =
+                post.nome
+                .split(" ")
+                .map(
+                    function (palavra) {
+
+                        return palavra
+                            .charAt(0)
+                            .toUpperCase();
+
+                    }
+                )
+                .slice(0, 2)
+                .join("");
+
+
+            let selo =
+                "";
+
+
+            if (post.premium) {
+
+                selo = `
+                    <span class="selo-post premium">
+                        ★ PREMIUM
+                    </span>
+                `;
+
+            } else if (
+                post.destaque
+            ) {
+
+                selo = `
+                    <span class="selo-post destaque">
+                        ★ DESTAQUE
+                    </span>
+                `;
+
+            }
+
+
+            elemento.innerHTML = `
+
+                ${selo}
+
+                <div class="post-topo">
+
+                    <div class="post-avatar">
+                        ${iniciais}
+                    </div>
+
+                    <div>
+
+                        <div class="post-autor">
+                            ${escaparHTML(
+                                post.nome
+                            )}
+                        </div>
+
+                        <span class="post-categoria">
+                            ${escaparHTML(
+                                post.categoria
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <h3>
+                    ${escaparHTML(
+                        post.titulo
+                    )}
+                </h3>
+
+
+                <p class="post-descricao">
+                    ${escaparHTML(
+                        post.descricao
+                    )}
+                </p>
+
+
+                <div class="post-contato">
+
+                    <strong>
+                        Contato:
+                    </strong>
+
+                    ${escaparHTML(
+                        post.contato
+                    )}
+
+                </div>
+
+            `;
+
+
+            areaPosts.appendChild(
+                elemento
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   SEGURANÇA DO TEXTO
+===================================================== */
+
+function escaparHTML(texto) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        texto;
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   MEUS POSTS
+===================================================== */
+
+botaoMeusPosts.addEventListener(
+    "click",
+    function () {
+
+        if (!usuarioLogado) {
+            return;
+        }
+
+
+        const meusPosts =
+            posts.filter(
+                function (post) {
+
+                    return (
+                        post.usuarioId ===
+                        usuarioLogado.id
+                    );
+
+                }
+            );
+
+
+        if (
+            meusPosts.length ===
+            0
+        ) {
+
+            alert(
+                "Você ainda não publicou nenhum post."
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "Você possui " +
+            meusPosts.length +
+            " post(s)."
+        );
+
+
+        fecharModal(
+            modalConta
+        );
+
+
+        document
+            .getElementById(
+                "posts"
+            )
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+    }
+);
+
+
+/* =====================================================
+   PERFIS DEMO
+===================================================== */
+
+const perfis =
+    document.querySelectorAll(
+        ".perfil"
+    );
+
+
+const dadosPerfis = {
+
+    "Alpha Design": {
+
+        categoria:
+            "Design",
+
+        descricao:
+            "Criação de artes, logos, banners e identidade visual.",
+
+        iniciais:
+            "AD"
+
+    },
+
+
+    "Bella Store": {
+
+        categoria:
+            "Beleza",
+
+        descricao:
+            "Produtos e serviços voltados para beleza e estética.",
+
+        iniciais:
+            "BS"
+
+    },
+
+
+    "Creative Media": {
+
+        categoria:
+            "Marketing",
+
+        descricao:
+            "Marketing digital e criação de conteúdo.",
+
+        iniciais:
+            "CM"
+
+    },
+
+
+    "Studio Pro": {
+
+        categoria:
+            "Tecnologia",
+
+        descricao:
+            "Criação de sites e soluções digitais.",
+
+        iniciais:
+            "SP"
+
+    }
+
+};
+
+
+perfis.forEach(
+    function (perfil) {
+
+        const botao =
+            perfil.querySelector(
+                ".ver-perfil"
+            );
+
+
+        botao.addEventListener(
+            "click",
+            function () {
+
+                const nome =
+                    perfil.getAttribute(
+                        "data-nome"
+                    );
+
+
+                const dados =
+                    dadosPerfis[nome];
+
+
+                if (!dados) {
+                    return;
+                }
+
+
+                document.getElementById(
+                    "perfilNome"
+                ).textContent =
+                    nome;
+
+
+                document.getElementById(
+                    "perfilCategoria"
+                ).textContent =
+                    dados.categoria;
+
+
+                document.getElementById(
+                    "perfilDescricao"
+                ).textContent =
+                    dados.descricao;
+
+
+                document.getElementById(
+                    "avatarPerfil"
+                ).textContent =
+                    dados.iniciais;
+
+
+                abrirModal(
+                    modalPerfil
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   FECHAR PERFIL
+===================================================== */
+
+fecharPerfil.addEventListener(
+    "click",
+    function () {
+
+        fecharModal(
+            modalPerfil
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CONTATO
+===================================================== */
+
+document
+    .getElementById(
+        "entrarEmContato"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            alert(
+                "Sistema de contato em desenvolvimento."
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   PESQUISA
+===================================================== */
+
+function filtrarPerfis() {
+
+    const texto =
+        pesquisa.value
+        .toLowerCase()
+        .trim();
+
+
+    const categoria =
+        filtroCategoria.value;
+
+
+    perfis.forEach(
+        function (perfil) {
+
+            const nome =
+                perfil
+                .getAttribute(
+                    "data-nome"
+                )
+                .toLowerCase();
+
+
+            const categoriaPerfil =
+                perfil
+                .getAttribute(
+                    "data-categoria"
+                );
+
+
+            const nomeCorresponde =
+                nome.includes(
+                    texto
+                );
+
+
+            const categoriaCorresponde =
+                categoria ===
+                    "todos" ||
+                categoriaPerfil ===
+                    categoria;
+
+
+            if (
+                nomeCorresponde &&
+                categoriaCorresponde
+            ) {
+
+                perfil.style.display =
+                    "block";
+
+            } else {
+
+                perfil.style.display =
+                    "none";
+
+            }
+
+        }
+    );
+
+}
+
+
+pesquisa.addEventListener(
+    "input",
+    filtrarPerfis
+);
+
+
+filtroCategoria.addEventListener(
+    "change",
+    filtrarPerfis
+);
+
+
+/* =====================================================
+   FECHAR MODAIS
+===================================================== */
+
+const todosModais =
+    document.querySelectorAll(
+        ".modal"
+    );
+
+
+todosModais.forEach(
+    function (modal) {
+
+        modal.addEventListener(
+            "click",
+            function (evento) {
+
+                if (
+                    evento.target ===
+                    modal
+                ) {
+
+                    fecharModal(
+                        modal
+                    );
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   ESC
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function (evento) {
+
+        if (
+            evento.key ===
+            "Escape"
+        ) {
+
+            todosModais.forEach(
+                function (modal) {
+
+                    fecharModal(
+                        modal
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+
+atualizarInterface();
+
+mostrarPosts();
+
+
+console.log(
+    "Impulso MKT iniciado corretamente."
+);
+
+
+// ============================================
+// IMPULSO MKT - MINHA CONTA
+// Perfil, foto, senha, plano e logout
+// ============================================
+
+(function () {
+    "use strict";
+
+    const $ = id => document.getElementById(id);
+
+    const PLANOS_CONTA = {
+        "Básico": [
+            ["Criar até 3 posts", true],
+            ["Perfil profissional", true],
+            ["Informações de contato", true],
+            ["Aparecer em destaque", false],
+            ["Selo de destaque", false],
+            ["Recursos Premium", false]
+        ],
+        "Destaque": [
+            ["Criar até 10 posts", true],
+            ["Perfil profissional", true],
+            ["Informações de contato", true],
+            ["Aparecer em destaque", true],
+            ["Prioridade nas buscas", true],
+            ["Selo de destaque", true],
+            ["Recursos Premium", false]
+        ],
+        "Premium": [
+            ["Posts ilimitados", true],
+            ["Perfil profissional completo", true],
+            ["Informações de contato", true],
+            ["Aparecer em destaque", true],
+            ["Prioridade nas buscas", true],
+            ["Selo Premium", true],
+            ["Todos os recursos disponíveis", true]
+        ]
+    };
+
+    function usuarioAtual() {
+        try {
+            const usuario = JSON.parse(
+                localStorage.getItem("impulsoUsuarioLogado")
+            );
+
+            return usuario && typeof usuario === "object"
+                ? usuario
+                : null;
+        } catch (erro) {
+            return null;
+        }
+    }
+
+    function salvarUsuario(usuario) {
+        try {
+            const lista = JSON.parse(
+                localStorage.getItem("impulsoUsuarios") || "[]"
+            );
+
+            const indice = lista.findIndex(
+                item => item.email === usuario.email
+            );
+
+            if (indice < 0) {
+                alert(
+                    "Não foi possível localizar esse cadastro. " +
+                    "Entre novamente na sua conta."
+                );
+                return false;
+            }
+
+            lista[indice] = {
+                ...lista[indice],
+                ...usuario
+            };
+
+            localStorage.setItem(
+                "impulsoUsuarios",
+                JSON.stringify(lista)
+            );
+
+            localStorage.setItem(
+                "impulsoUsuarioLogado",
+                JSON.stringify(usuario)
+            );
+
+            return true;
+        } catch (erro) {
+            alert(
+                "Não foi possível salvar os dados. " +
+                "Verifique o espaço disponível no navegador."
+            );
+            return false;
+        }
+    }
+
+    function abrirModal(id) {
+        const modal = $(id);
+        if (modal) modal.style.display = "flex";
+    }
+
+    function fecharModal(id) {
+        const modal = $(id);
+        if (modal) modal.style.display = "none";
+    }
+
+    function atualizarRecursos(plano) {
+        const lista = $("listaRecursos");
+        if (!lista) return;
+
+        lista.replaceChildren();
+
+        const recursos = PLANOS_CONTA[plano] || [
+            ["Escolha um plano para liberar os recursos", false]
+        ];
+
+        recursos.forEach(([nome, ativo]) => {
+            const item = document.createElement("div");
+
+            item.className = "recurso-conta " +
+                (ativo ? "ativo" : "bloqueado");
+
+            item.textContent = (ativo ? "✓  " : "🔒  ") + nome;
+            lista.appendChild(item);
+        });
+    }
+
+    function atualizarContaUI() {
+        const usuario = usuarioAtual();
+        if (!usuario) return;
+
+        const nome = usuario.nome || "Usuário";
+        const plano = usuario.plano || "";
+
+        if ($("nomeConta")) $("nomeConta").textContent = nome;
+        if ($("emailConta")) {
+            $("emailConta").textContent = usuario.email || "";
+        }
+
+        if ($("contaNomeProfissional")) {
+            $("contaNomeProfissional").textContent =
+                usuario.nomeProfissional || nome;
+        }
+
+        if ($("contaCategoria")) {
+            $("contaCategoria").textContent =
+                usuario.categoria || "Não informada";
+        }
+
+        if ($("contaDescricao")) {
+            $("contaDescricao").textContent =
+                usuario.descricao || "Adicione uma descrição.";
+        }
+
+        if ($("nomePlanoAtual")) {
+            $("nomePlanoAtual").textContent = plano || "Sem plano";
+        }
+
+        const avatar = $("avatarConta");
+
+        if (avatar) {
+            if (usuario.foto) {
+                avatar.style.backgroundImage =
+                    `url("${usuario.foto}")`;
+                avatar.textContent = "";
+            } else {
+                avatar.style.backgroundImage = "none";
+                avatar.textContent =
+                    nome.trim().charAt(0).toUpperCase() || "U";
+            }
+        }
+
+        atualizarRecursos(plano);
+
+        // Atualiza também a função antiga de recursos, se existir.
+        if (typeof window.atualizarConta === "function") {
+            // Evita recursão se a função antiga tiver o mesmo propósito.
+            // A lista desta versão já foi atualizada acima.
+        }
+    }
+
+    // Abre a conta pelo botão do cabeçalho.
+    // A abertura do modal de login continua sob responsabilidade
+    // do sistema de login que já existe no projeto.
+    $("abrirLogin")?.addEventListener("click", function () {
+        const usuario = usuarioAtual();
+
+        if (usuario) {
+            atualizarContaUI();
+        }
+    });
+
+    // Atualiza perfil quando o modal é aberto.
+    $("modalConta")?.addEventListener("click", function (evento) {
+        if (evento.target === this) {
+            fecharModal("modalConta");
+        }
+    });
+
+    $("fecharConta")?.addEventListener("click", function () {
+        fecharModal("modalConta");
+    });
+
+    // FOTO DE PERFIL
+    $("fotoPerfil")?.addEventListener("change", function () {
+        const arquivo = this.files && this.files[0];
+        if (!arquivo) return;
+
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            this.value = "";
+            return;
+        }
+
+        if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) {
+            alert("Use uma imagem JPG, PNG ou WebP.");
+            this.value = "";
+            return;
+        }
+
+        if (arquivo.size > 700 * 1024) {
+            alert("Escolha uma imagem de até 700 KB.");
+            this.value = "";
+            return;
+        }
+
+        const leitor = new FileReader();
+
+        leitor.onload = function () {
+            usuario.foto = leitor.result;
+
+            if (salvarUsuario(usuario)) {
+                atualizarContaUI();
+                alert("Foto atualizada!");
+            }
+        };
+
+        leitor.onerror = function () {
+            alert("Não foi possível abrir essa imagem.");
+        };
+
+        leitor.readAsDataURL(arquivo);
+    });
+
+    // ABRIR E PREENCHER EDIÇÃO DE PERFIL
+    $("botaoEditarPerfil")?.addEventListener("click", function () {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        $("editarNome").value =
+            usuario.nomeProfissional || usuario.nome || "";
+
+        $("editarCategoria").value = usuario.categoria || "";
+        $("editarDescricao").value = usuario.descricao || "";
+
+        fecharModal("modalConta");
+        abrirModal("modalEditarPerfil");
+    });
+
+    $("fecharEditarPerfil")?.addEventListener("click", function () {
+        fecharModal("modalEditarPerfil");
+        abrirModal("modalConta");
+    });
+
+    $("formEditarPerfil")?.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const usuario = usuarioAtual();
+        if (!usuario) {
+            alert("Entre novamente na sua conta.");
+            return;
+        }
+
+        const nome = $("editarNome").value.trim();
+        const categoria = $("editarCategoria").value;
+        const descricao = $("editarDescricao").value.trim();
+
+        if (!nome || !categoria) {
+            alert("Informe o nome e a categoria.");
+            return;
+        }
+
+        usuario.nomeProfissional = nome;
+        usuario.categoria = categoria;
+        usuario.descricao = descricao;
+
+        if (!salvarUsuario(usuario)) return;
+
+        fecharModal("modalEditarPerfil");
+        atualizarContaUI();
+        abrirModal("modalConta");
+
+        alert("Perfil atualizado com sucesso!");
+    });
+
+    // ALTERAR SENHA
+    $("botaoAlterarSenha")?.addEventListener("click", function () {
+        if (!usuarioAtual()) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        $("formAlterarSenha")?.reset();
+        fecharModal("modalConta");
+        abrirModal("modalAlterarSenha");
+    });
+
+    $("fecharAlterarSenha")?.addEventListener("click", function () {
+        fecharModal("modalAlterarSenha");
+        abrirModal("modalConta");
+    });
+
+    $("formAlterarSenha")?.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const usuario = usuarioAtual();
+        if (!usuario) {
+            alert("Entre novamente na sua conta.");
+            return;
+        }
+
+        const atual = $("senhaAtualConta").value;
+        const nova = $("novaSenhaConta").value;
+        const confirmar = $("confirmarSenhaConta").value;
+
+        // Compatibilidade com o cadastro demonstrativo atual.
+        if (atual !== usuario.senha) {
+            alert("A senha atual está incorreta.");
+            return;
+        }
+
+        if (nova.length < 8) {
+            alert("A nova senha deve ter pelo menos 8 caracteres.");
+            return;
+        }
+
+        if (nova !== confirmar) {
+            alert("As senhas novas não coincidem.");
+            return;
+        }
+
+        usuario.senha = nova;
+
+        if (!salvarUsuario(usuario)) return;
+
+        $("formAlterarSenha").reset();
+        fecharModal("modalAlterarSenha");
+        abrirModal("modalConta");
+
+        alert("Senha alterada com sucesso!");
+    });
+
+    // MUDAR PLANO
+    $("botaoMudarPlano")?.addEventListener("click", function () {
+        fecharModal("modalConta");
+
+        const secaoPlanos = $("planos");
+
+        if (secaoPlanos) {
+            secaoPlanos.scrollIntoView({ behavior: "smooth" });
+        } else {
+            alert("Não foi possível encontrar a seção de planos.");
+        }
+    });
+
+    // CRIAR POST E VER POSTS
+    // Reutiliza os botões do sistema de publicações existente.
+    $("botaoCriarPost")?.addEventListener("click", function () {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        if (!usuario.plano) {
+            alert("Escolha um plano antes de criar publicações.");
+            fecharModal("modalConta");
+            $("planos")?.scrollIntoView({ behavior: "smooth" });
+            return;
+        }
+
+        fecharModal("modalConta");
+        abrirModal("modalPost");
+    });
+
+    $("botaoMeusPosts")?.addEventListener("click", function () {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        fecharModal("modalConta");
+
+        const secaoPosts = $("posts");
+
+        if (secaoPosts) {
+            secaoPosts.scrollIntoView({ behavior: "smooth" });
+        } else {
+            alert("A seção de publicações não foi encontrada.");
+        }
+    });
+
+    // LOGOUT
+    $("botaoSair")?.addEventListener("click", function () {
+        if (!usuarioAtual()) {
+            fecharModal("modalConta");
+            return;
+        }
+
+        const confirmar = confirm("Deseja realmente sair da sua conta?");
+        if (!confirmar) return;
+
+        localStorage.removeItem("impulsoUsuarioLogado");
+
+        fecharModal("modalConta");
+        fecharModal("modalEditarPerfil");
+        fecharModal("modalAlterarSenha");
+
+        // Atualiza o botão de cabeçalho, se o sistema existente o utiliza.
+        const botao = $("abrirLogin");
+        if (botao) botao.textContent = "Entrar";
+
+        alert("Você saiu da sua conta.");
+    });
+
+    // Atualiza os dados ao carregar a página.
+    document.addEventListener("DOMContentLoaded", atualizarContaUI);
+
+    // Permite que o restante do sistema atualize a conta após o login.
+    window.atualizarMinhaContaImpulso = atualizarContaUI;
+
+})();
+
+if (typeof window.atualizarMinhaContaImpulso === "function") {
+    window.atualizarMinhaContaImpulso();
+}
+
+
+// ==============================================
+// IMPULSO MKT - SISTEMA DE PUBLICAÇÕES
+// Edite, exclua, imagem, WhatsApp e visualizações
+// ==============================================
+
+(function () {
+    "use strict";
+
+    const $ = id => document.getElementById(id);
+
+    const LIMITES_POSTS = {
+        "Básico": 3,
+        "Destaque": 10,
+        "Premium": Infinity
+    };
+
+    const NOMES_PLANOS = {
+        "basico": "Básico",
+        "básico": "Básico",
+        "destaque": "Destaque",
+        "premium": "Premium"
+    };
+
+    let imagemSelecionada = null;
+    let carregamentoImagem = 0;
+
+    function usuarioAtual() {
+        try {
+            return JSON.parse(
+                localStorage.getItem("impulsoUsuarioLogado")
+            );
+        } catch {
+            return null;
+        }
+    }
+
+    function lerPosts() {
+        try {
+            const dados = JSON.parse(
+                localStorage.getItem("impulsoPosts") || "[]"
+            );
+
+            return Array.isArray(dados) ? dados : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function salvarPosts(posts) {
+        try {
+            localStorage.setItem(
+                "impulsoPosts",
+                JSON.stringify(posts)
+            );
+
+            return true;
+        } catch {
+            alert(
+                "Não foi possível salvar as publicações. " +
+                "A imagem pode ser grande demais para o armazenamento local."
+            );
+
+            return false;
+        }
+    }
+
+    function nomePlano(usuario) {
+        if (!usuario || !usuario.plano) return "";
+
+        const chave = String(usuario.plano).trim().toLowerCase();
+
+        return NOMES_PLANOS[chave] || "";
+    }
+
+    function normalizarPlano(plano) {
+        const chave = String(plano || "").trim().toLowerCase();
+
+        return NOMES_PLANOS[chave] || "Básico";
+    }
+
+    function donoDoPost(post, usuario) {
+        const emailPost = post.email || post.usuarioEmail ||
+            post.autorEmail || "";
+
+        return Boolean(
+            usuario &&
+            emailPost &&
+            usuario.email &&
+            emailPost.toLowerCase() === usuario.email.toLowerCase()
+        );
+    }
+
+    function fecharModal(id) {
+        const modal = $(id);
+        if (modal) modal.style.display = "none";
+    }
+
+    function abrirModal(id) {
+        const modal = $(id);
+        if (modal) modal.style.display = "flex";
+    }
+
+    function escaparHTML(valor) {
+        return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[caractere]);
+    }
+
+    function telefoneWhatsApp(valor) {
+        let numero = String(valor || "").replace(/\D/g, "");
+
+        // Adiciona o código do Brasil se ele não estiver presente.
+        if (numero.length === 10 || numero.length === 11) {
+            numero = "55" + numero;
+        }
+
+        // Aceita somente números brasileiros com DDD.
+        if (!/^55[1-9]\d9?\d{8}$/.test(numero)) {
+            return "";
+        }
+
+        return numero;
+    }
+
+    function resetarFormulario() {
+        $("formPost")?.reset();
+
+        if ($("postIdEdicao")) {
+            $("postIdEdicao").value = "";
+        }
+
+        imagemSelecionada = null;
+
+        if ($("previewImagemPost")) {
+            $("previewImagemPost").replaceChildren();
+        }
+
+        if ($("botaoSalvarPost")) {
+            $("botaoSalvarPost").textContent = "Publicar post";
+        }
+    }
+
+    function imagemDoPost(post) {
+        if (!post.imagem) return "";
+
+        return `
+            <img
+                class="post-imagem"
+                src="${escaparHTML(post.imagem)}"
+                alt="Imagem da publicação"
+                loading="lazy"
+            >
+        `;
+    }
+
+    function classePlano(plano) {
+        const nome = normalizarPlano(plano);
+
+        if (nome === "Premium") return "post-premium";
+        if (nome === "Destaque") return "post-destaque";
+
+        return "post-basico";
+    }
+
+    function mostrarPosts() {
+        const area = $("areaPosts");
+        if (!area) return;
+
+        const usuario = usuarioAtual();
+
+        const posts = lerPosts().sort((a, b) => {
+            const prioridade = {
+                "Premium": 3,
+                "Destaque": 2,
+                "Básico": 1
+            };
+
+            const planoA = normalizarPlano(a.plano);
+            const planoB = normalizarPlano(b.plano);
+
+            return prioridade[planoB] - prioridade[planoA];
+        });
+
+        area.replaceChildren();
+
+        if (posts.length === 0) {
+            const vazio = document.createElement("div");
+
+            vazio.className = "sem-posts";
+            vazio.innerHTML = `
+                <div class="icone-post">📢</div>
+                <h3>Ainda não existem publicações</h3>
+                <p>Seja o primeiro a divulgar seu trabalho.</p>
+            `;
+
+            area.appendChild(vazio);
+            return;
+        }
+
+        posts.forEach(post => {
+            const plano = normalizarPlano(post.plano);
+            const categoria = String(post.categoria || "Outros");
+            const nome = String(post.nome || "Profissional");
+            const titulo = String(post.titulo || "Publicação");
+            const descricao = String(post.descricao || "");
+            const contato = String(post.contato || "");
+            const views = Number(post.visualizacoes) || 0;
+            const meuPost = donoDoPost(post, usuario);
+
+            const card = document.createElement("article");
+            card.className = `post ${classePlano(plano)}`;
+
+            card.dataset.postId = post.id;
+
+            const avatarLetra = escaparHTML(
+                nome.trim().charAt(0).toUpperCase() || "P"
+            );
+
+            const selo = plano === "Premium"
+                ? "★ PREMIUM"
+                : plano === "Destaque"
+                    ? "★ DESTAQUE"
+                    : "PLANO BÁSICO";
+
+            const numeroWhatsApp = telefoneWhatsApp(contato);
+
+            const contatoHTML = numeroWhatsApp
+                ? `<a class="post-whatsapp"
+                      href="https://wa.me/${numeroWhatsApp}"
+                      target="_blank"
+                      rel="noopener noreferrer">
+                      Conversar pelo WhatsApp
+                   </a>`
+                : `<p class="post-descricao">
+                       Contato indisponível ou número inválido.
+                   </p>`;
+
+            card.innerHTML = `
+                ${imagemDoPost(post)}
+
+                <span class="post-plano">${selo}</span>
+
+                <div class="post-topo">
+                    <div class="post-avatar">${avatarLetra}</div>
+                    <div>
+                        <div class="post-autor">${escaparHTML(nome)}</div>
+                        <span class="post-categoria">
+                            ${escaparHTML(categoria)}
+                        </span>
+                    </div>
+                </div>
+
+                <h3>${escaparHTML(titulo)}</h3>
+
+                <p class="post-descricao">
+                    ${escaparHTML(descricao)}
+                </p>
+
+                <div class="post-estatisticas">
+                    👁️ <span class="contador-views">${views}</span>
+                    visualizações
+                </div>
+
+                <div class="post-acoes">
+                    <button type="button" class="post-ver">
+                        Ver publicação
+                    </button>
+
+                    ${contatoHTML}
+
+                    ${meuPost ? `
+                        <button type="button" class="post-editar">
+                            ✏️ Editar publicação
+                        </button>
+
+                        <button type="button" class="post-excluir">
+                            🗑️ Excluir publicação
+                        </button>
+                    ` : ""}
+                </div>
+            `;
+
+            // Visualizar publicação incrementa a contagem local.
+            card.querySelector(".post-ver").addEventListener(
+                "click",
+                function () {
+                    const postsAtuais = lerPosts();
+                    const indice = postsAtuais.findIndex(
+                        item => item.id === post.id
+                    );
+
+                    if (indice < 0) return;
+
+                    postsAtuais[indice].visualizacoes =
+                        (Number(postsAtuais[indice].visualizacoes) || 0) + 1;
+
+                    if (!salvarPosts(postsAtuais)) return;
+
+                    card.querySelector(".contador-views").textContent =
+                        postsAtuais[indice].visualizacoes;
+
+                    alert(
+                        titulo + "\n\n" +
+                        descricao + "\n\n" +
+                        "Visualizações: " +
+                        postsAtuais[indice].visualizacoes
+                    );
+                }
+            );
+
+            // Somente o dono pode editar.
+            if (meuPost) {
+                card.querySelector(".post-editar").addEventListener(
+                    "click",
+                    function () {
+                        editarPost(post.id);
+                    }
+                );
+
+                card.querySelector(".post-excluir").addEventListener(
+                    "click",
+                    function () {
+                        excluirPost(post.id);
+                    }
+                );
+            }
+
+            area.appendChild(card);
+        });
+    }
+
+    function editarPost(id) {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta para editar uma publicação.");
+            return;
+        }
+
+        const post = lerPosts().find(item => item.id === id);
+
+        if (!post || !donoDoPost(post, usuario)) {
+            alert("Você não tem permissão para editar esta publicação.");
+            return;
+        }
+
+        resetarFormulario();
+
+        $("postIdEdicao").value = post.id;
+        $("postNome").value = post.nome || "";
+        $("postCategoria").value = post.categoria || "";
+        $("postTitulo").value = post.titulo || "";
+        $("postDescricao").value = post.descricao || "";
+        $("postContato").value = post.contato || "";
+
+        imagemSelecionada = post.imagem || null;
+
+        if (imagemSelecionada && $("previewImagemPost")) {
+            const imagem = document.createElement("img");
+            imagem.src = imagemSelecionada;
+            imagem.alt = "Pré-visualização da imagem";
+
+            $("previewImagemPost").replaceChildren(imagem);
+        }
+
+        if ($("botaoSalvarPost")) {
+            $("botaoSalvarPost").textContent = "Salvar alterações";
+        }
+
+        fecharModal("modalConta");
+        abrirModal("modalPost");
+    }
+
+    function excluirPost(id) {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        const post = lerPosts().find(item => item.id === id);
+
+        if (!post || !donoDoPost(post, usuario)) {
+            alert("Você não pode excluir esta publicação.");
+            return;
+        }
+
+        if (!confirm("Deseja realmente excluir esta publicação?")) {
+            return;
+        }
+
+        const restantes = lerPosts().filter(item => item.id !== id);
+
+        if (salvarPosts(restantes)) {
+            mostrarPosts();
+            alert("Publicação excluída.");
+        }
+    }
+
+    // IMAGEM E PRÉ-VISUALIZAÇÃO
+    $("postImagem")?.addEventListener("change", function () {
+        const arquivo = this.files && this.files[0];
+
+        if (!arquivo) {
+            imagemSelecionada = null;
+            return;
+        }
+
+        if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) {
+            alert("Escolha uma imagem JPG, PNG ou WebP.");
+            this.value = "";
+            return;
+        }
+
+        if (arquivo.size > 500 * 1024) {
+            alert("A imagem deve ter no máximo 500 KB.");
+            this.value = "";
+            return;
+        }
+
+        const leitor = new FileReader();
+        const tentativa = ++carregamentoImagem;
+
+        leitor.onload = function () {
+            if (tentativa !== carregamentoImagem) return;
+
+            imagemSelecionada = leitor.result;
+
+            const preview = $("previewImagemPost");
+            if (!preview) return;
+
+            const imagem = document.createElement("img");
+            imagem.src = imagemSelecionada;
+            imagem.alt = "Pré-visualização da publicação";
+
+            preview.replaceChildren(imagem);
+        };
+
+        leitor.onerror = function () {
+            alert("Não foi possível carregar a imagem.");
+        };
+
+        leitor.readAsDataURL(arquivo);
+    });
+
+    // CRIAR OU SALVAR ALTERAÇÕES
+    $("formPost")?.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta para publicar.");
+            return;
+        }
+
+        const plano = nomePlano(usuario);
+
+        if (!plano) {
+            alert("Escolha um plano antes de publicar.");
+            fecharModal("modalPost");
+            $("planos")?.scrollIntoView({ behavior: "smooth" });
+            return;
+        }
+
+        const idEdicao = $("postIdEdicao")?.value;
+        const posts = lerPosts();
+
+        const existente = idEdicao
+            ? posts.find(post => post.id === idEdicao)
+            : null;
+
+        if (idEdicao && (!existente || !donoDoPost(existente, usuario))) {
+            alert("Não foi possível localizar sua publicação.");
+            return;
+        }
+
+        const meusPosts = posts.filter(post => donoDoPost(post, usuario));
+        const limite = LIMITES_POSTS[plano];
+
+        if (!existente && meusPosts.length >= limite) {
+            alert(
+                `Seu plano ${plano} permite ` +
+                `${limite === Infinity ? "posts ilimitados" : limite + " posts"}. ` +
+                "Mude de plano para publicar mais."
+            );
+            return;
+        }
+
+        const contato = $("postContato").value.trim();
+        const numero = telefoneWhatsApp(contato);
+
+        if (!numero) {
+            alert(
+                "Informe um número brasileiro válido com DDD, " +
+                "por exemplo: 49999999999."
+            );
+            return;
+        }
+
+        const post = {
+            id: existente ? existente.id : (
+                "post_" + Date.now() + "_" +
+                Math.random().toString(36).slice(2, 8)
+            ),
+            email: usuario.email,
+            nome: $("postNome").value.trim(),
+            categoria: $("postCategoria").value,
+            titulo: $("postTitulo").value.trim(),
+            descricao: $("postDescricao").value.trim(),
+            contato: contato,
+            imagem: imagemSelecionada ||
+                (existente ? existente.imagem || null : null),
+            plano: plano,
+            visualizacoes: existente
+                ? Number(existente.visualizacoes) || 0
+                : 0,
+            criadoEm: existente ? existente.criadoEm : new Date().toISOString()
+        };
+
+        if (!post.nome || !post.titulo || !post.descricao) {
+            alert("Preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        const atualizados = existente
+            ? posts.map(item => item.id === post.id ? post : item)
+            : [post, ...posts];
+
+        if (!salvarPosts(atualizados)) return;
+
+        resetarFormulario();
+        fecharModal("modalPost");
+        mostrarPosts();
+
+        alert(existente
+            ? "Publicação atualizada com sucesso!"
+            : "Publicação criada com sucesso!"
+        );
+    });
+
+    // Botão para criar post na área da conta.
+    // Este evento evita abrir o formulário sem login ou plano.
+    $("botaoCriarPost")?.addEventListener("click", function () {
+        const usuario = usuarioAtual();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        if (!nomePlano(usuario)) {
+            alert("Escolha um plano antes de publicar.");
+            fecharModal("modalConta");
+            $("planos")?.scrollIntoView({ behavior: "smooth" });
+            return;
+        }
+
+        resetarFormulario();
+        fecharModal("modalConta");
+        abrirModal("modalPost");
+    });
+
+    // Botão de fechar o modal de publicação.
+    $("fecharPost")?.addEventListener("click", function () {
+        fecharModal("modalPost");
+        resetarFormulario();
+    });
+
+    // Atualiza a lista quando a página abre.
+    document.addEventListener("DOMContentLoaded", mostrarPosts);
+
+    // Permite que o restante do site atualize os cards após login.
+    window.atualizarPostsImpulso = mostrarPosts;
+
+    // Executa também caso este script seja carregado após o evento DOMContentLoaded.
+    mostrarPosts();
+
+})();
+
+
+// =====================================
+// CORREÇÃO: EXCLUIR PUBLICAÇÕES
+// =====================================
+
+document.addEventListener("click", function (evento) {
+    const botao = evento.target.closest(".post-excluir");
+
+    if (!botao) return;
+
+    const card = botao.closest(".post");
+
+    if (!card) {
+        alert("Não foi possível identificar esta publicação.");
+        return;
+    }
+
+    const usuario = JSON.parse(
+        localStorage.getItem("impulsoUsuarioLogado") || "null"
+    );
+
+    if (!usuario || !usuario.email) {
+        alert("Entre na sua conta para excluir uma publicação.");
+        return;
+    }
+
+    const titulo = card.querySelector("h3")?.textContent || "esta publicação";
+
+    if (!confirm(`Deseja realmente excluir "${titulo}"?`)) {
+        return;
+    }
+
+    let posts;
+
+    try {
+        posts = JSON.parse(
+            localStorage.getItem("impulsoPosts") || "[]"
+        );
+
+        if (!Array.isArray(posts)) {
+            throw new Error("Formato inválido");
+        }
+    } catch (erro) {
+        alert("Não foi possível carregar as publicações.");
+        return;
+    }
+
+    // Localiza o post pelo ID armazenado no próprio card.
+    const idPost = card.dataset.postId;
+
+    if (!idPost) {
+        alert(
+            "Esta publicação não possui identificador. " +
+            "Atualize a criação dos posts para salvar o ID no card."
+        );
+        return;
+    }
+
+    const indice = posts.findIndex(post =>
+        String(post.id) === String(idPost) &&
+        String(post.email || post.usuarioEmail || post.autorEmail || "")
+            .toLowerCase() === usuario.email.toLowerCase()
+    );
+
+    if (indice === -1) {
+        alert(
+            "Publicação não encontrada ou você não é o proprietário."
+        );
+        return;
+    }
+
+    posts.splice(indice, 1);
+
+    try {
+        localStorage.setItem("impulsoPosts", JSON.stringify(posts));
+    } catch (erro) {
+        alert("Não foi possível salvar a exclusão.");
+        return;
+    }
+
+    // Atualiza a lista visual.
+    if (typeof window.atualizarPostsImpulso === "function") {
+        window.atualizarPostsImpulso();
+    } else {
+        card.remove();
+    }
+
+    alert("Publicação excluída com sucesso!");
+});
+
+
+
+
+/* =========================================
+   SISTEMA DE PLANOS - IMPULSO MKT
+========================================= */
+
+const PLANOS_IMPULSO = {
+    basico: {
+        nome: "Básico",
+        limitePosts: 3,
+        prioridade: 1,
+        destaque: false,
+        ilimitado: false,
+        recursos: {
+            publicar: true,
+            editar: true,
+            excluir: true,
+            destaqueVisual: false,
+            prioridadeBusca: false,
+            estatisticas: false,
+            seloPremium: false
+        }
+    },
+
+    destaque: {
+        nome: "Destaque",
+        limitePosts: 10,
+        prioridade: 2,
+        destaque: true,
+        ilimitado: false,
+        recursos: {
+            publicar: true,
+            editar: true,
+            excluir: true,
+            destaqueVisual: true,
+            prioridadeBusca: true,
+            estatisticas: true,
+            seloPremium: false
+        }
+    },
+
+    premium: {
+        nome: "Premium",
+        limitePosts: Infinity,
+        prioridade: 3,
+        destaque: true,
+        ilimitado: true,
+        recursos: {
+            publicar: true,
+            editar: true,
+            excluir: true,
+            destaqueVisual: true,
+            prioridadeBusca: true,
+            estatisticas: true,
+            seloPremium: true
+        }
+    }
+};
+
+/* Obtém o usuário conectado */
+function usuarioAtualImpulso() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("impulsoUsuarioLogado") || "null"
+        );
+    } catch {
+        return null;
+    }
+}
+
+/* Normaliza o nome do plano */
+function normalizarPlanoImpulso(plano) {
+    const nome = String(plano || "basico")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    if (nome.includes("premium")) return "premium";
+    if (nome.includes("destaque")) return "destaque";
+
+    return "basico";
+}
+
+/* Descobre o plano do usuário */
+function planoAtualImpulso() {
+    const usuario = usuarioAtualImpulso();
+
+    if (!usuario) return "basico";
+
+    return normalizarPlanoImpulso(
+        usuario.plano || usuario.assinatura || "basico"
+    );
+}
+
+/* Retorna a configuração do plano */
+function configuracaoPlanoImpulso(plano) {
+    return PLANOS_IMPULSO[normalizarPlanoImpulso(plano)];
+}
+
+/* Conta os posts de um usuário */
+function contarPostsUsuarioImpulso(email) {
+    const posts = JSON.parse(
+        localStorage.getItem("impulsoPosts") || "[]"
+    );
+
+    return posts.filter(post =>
+        String(post.email || post.usuarioEmail || post.autorEmail || "")
+            .toLowerCase() === String(email || "").toLowerCase()
+    ).length;
+}
+
+/* Verifica se pode publicar */
+function podePublicarImpulso() {
+    const usuario = usuarioAtualImpulso();
+
+    if (!usuario || !usuario.email) {
+        return {
+            permitido: false,
+            mensagem: "Entre na sua conta para publicar."
+        };
+    }
+
+    const plano = planoAtualImpulso();
+    const config = configuracaoPlanoImpulso(plano);
+    const quantidade = contarPostsUsuarioImpulso(usuario.email);
+
+    if (quantidade >= config.limitePosts) {
+        return {
+            permitido: false,
+            mensagem: `Você atingiu o limite de ${config.limitePosts} publicações do plano ${config.nome}. Faça um upgrade para publicar mais.`
+        };
+    }
+
+    return {
+        permitido: true,
+        mensagem: "",
+        quantidade,
+        limite: config.limitePosts,
+        plano
+    };
+}
+
+/* Exibe o uso de publicações */
+function atualizarLimitePostsImpulso() {
+    const usuario = usuarioAtualImpulso();
+    const elemento = document.getElementById("limite-posts");
+
+    if (!elemento) return;
+
+    if (!usuario || !usuario.email) {
+        elemento.textContent = "Entre na conta para ver seu limite.";
+        return;
+    }
+
+    const plano = planoAtualImpulso();
+    const config = configuracaoPlanoImpulso(plano);
+    const quantidade = contarPostsUsuarioImpulso(usuario.email);
+
+    elemento.textContent = config.ilimitado
+        ? `${quantidade} publicações utilizadas · Ilimitado`
+        : `${quantidade} de ${config.limitePosts} publicações utilizadas`;
+}
+
+/* Bloqueia visualmente recursos indisponíveis */
+function atualizarRecursosImpulso() {
+    const plano = planoAtualImpulso();
+    const recursos = configuracaoPlanoImpulso(plano).recursos;
+
+    document.querySelectorAll("[data-recurso]").forEach(elemento => {
+        const recurso = elemento.dataset.recurso;
+        const liberado = recursos[recurso] === true;
+
+        elemento.classList.toggle("recurso-bloqueado", !liberado);
+        elemento.setAttribute("aria-disabled", String(!liberado));
+
+        if ("disabled" in elemento && elemento.tagName !== "A") {
+            elemento.disabled = !liberado;
+        }
+
+        let aviso = elemento.querySelector(".aviso-plano");
+
+        if (!liberado) {
+            if (!aviso) {
+                aviso = document.createElement("span");
+                aviso.className = "aviso-plano";
+                aviso.textContent = " 🔒 Recurso indisponível no seu plano";
+                elemento.appendChild(aviso);
+            }
+        } else if (aviso) {
+            aviso.remove();
+        }
+    });
+}
+
+/* Ordem: Premium > Destaque > Básico */
+function ordenarPostsImpulso(posts) {
+    return [...posts].sort((a, b) => {
+        const prioridadeA =
+            configuracaoPlanoImpulso(a.plano).prioridade;
+        const prioridadeB =
+            configuracaoPlanoImpulso(b.plano).prioridade;
+
+        if (prioridadeA !== prioridadeB) {
+            return prioridadeB - prioridadeA;
+        }
+
+        return new Date(b.criadoEm || 0) -
+               new Date(a.criadoEm || 0);
+    });
+}
+
+/* Inicializa os indicadores */
+document.addEventListener("DOMContentLoaded", () => {
+    atualizarLimitePostsImpulso();
+    atualizarRecursosImpulso();
+});
