@@ -3235,3 +3235,580 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarLimitePostsImpulso();
     atualizarRecursosImpulso();
 });
+
+
+/* =====================================================
+   SISTEMA DE BUSCA - IMPULSO MKT (CORRIGIDO)
+===================================================== */
+
+(function () {
+    "use strict";
+
+    function normalizar(texto) {
+        return String(texto ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
+    function obterPosts() {
+        try {
+            const dados = JSON.parse(
+                localStorage.getItem("impulsoPosts") || "[]"
+            );
+
+            return Array.isArray(dados) ? dados : [];
+        } catch (erro) {
+            console.error("Erro ao carregar publicações:", erro);
+            return [];
+        }
+    }
+
+    function iniciarBusca() {
+        const campo = document.getElementById("campoBusca");
+        const categoria = document.getElementById("filtroCategoria");
+        const cidade = document.getElementById("filtroCidade");
+        const servico = document.getElementById("filtroServico");
+        const plano = document.getElementById("filtroPlano");
+        const avaliacao = document.getElementById("filtroAvaliacao");
+
+        const botaoBuscar = document.getElementById("btnBuscar");
+        const botaoLimpar = document.getElementById("btnLimparBusca");
+        const contador = document.getElementById("quantidadeResultados");
+
+        const areaPosts = document.getElementById("areaPosts");
+
+        if (!campo || !areaPosts) {
+            console.error(
+                "Busca: confira os IDs campoBusca e areaPosts no HTML."
+            );
+            return;
+        }
+
+        function valorFiltro(elemento) {
+            const valor = normalizar(elemento?.value || "");
+
+            // Opções que significam "não filtrar".
+            if (["", "todos", "todas", "qualquer"].includes(valor)) {
+                return "";
+            }
+
+            return valor;
+        }
+
+        function filtrar() {
+            const posts = obterPosts();
+
+            const termo = normalizar(campo.value);
+            const cat = valorFiltro(categoria);
+            const cid = valorFiltro(cidade);
+            const tipoServico = valorFiltro(servico);
+            const tipoPlano = valorFiltro(plano);
+            const notaMinima = Number(avaliacao?.value || 0);
+
+            const resultados = posts.filter(function (post) {
+                const textoCompleto = normalizar([
+                    post.nome,
+                    post.empresa,
+                    post.titulo,
+                    post.descricao,
+                    post.categoria,
+                    post.servico,
+                    post.tipoServico,
+                    post.profissao,
+                    post.especialidade,
+                    post.cidade,
+                    post.regiao,
+                    post.localizacao,
+                    post.bairro,
+                    post.estado
+                ].join(" "));
+
+                // Busca por nome, empresa, serviço ou descrição.
+                if (termo && !textoCompleto.includes(termo)) {
+                    return false;
+                }
+
+                // Categoria.
+                if (
+                    cat &&
+                    !normalizar(post.categoria).includes(cat)
+                ) {
+                    return false;
+                }
+
+                // Cidade ou região.
+                const localizacao = normalizar([
+                    post.cidade,
+                    post.regiao,
+                    post.localizacao,
+                    post.bairro,
+                    post.estado
+                ].join(" "));
+
+                if (cid && !localizacao.includes(cid)) {
+                    return false;
+                }
+
+                // Tipo de serviço.
+                const servicosPost = normalizar([
+                    post.servico,
+                    post.tipoServico,
+                    post.profissao,
+                    post.especialidade,
+                    post.titulo,
+                    post.descricao
+                ].join(" "));
+
+                if (
+                    tipoServico &&
+                    !servicosPost.includes(tipoServico)
+                ) {
+                    return false;
+                }
+
+                // Plano.
+                const planoPost = normalizar(post.plano)
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+
+                const planoFiltro = tipoPlano
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+
+                if (planoFiltro && planoPost !== planoFiltro) {
+                    return false;
+                }
+
+                // Nota mínima. Posts sem avaliação não passam
+                // quando o usuário escolhe uma nota mínima.
+                if (notaMinima > 0) {
+                    const nota = Number(
+                        post.avaliacao ??
+                        post.avaliacaoMedia ??
+                        post.nota ??
+                        post.estrelas ??
+                        0
+                    );
+
+                    if (nota < notaMinima) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // Premium primeiro, depois Destaque e Básico.
+            const prioridade = {
+                premium: 3,
+                destaque: 2,
+                basico: 1
+            };
+
+            resultados.sort(function (a, b) {
+                const planoA = normalizar(a.plano)
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+
+                const planoB = normalizar(b.plano)
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+
+                return (prioridade[planoB] || 0) -
+                       (prioridade[planoA] || 0);
+            });
+
+            // Exibe somente os cards encontrados.
+            const ids = new Set(
+                resultados.map(post => String(post.id))
+            );
+
+            const cards = areaPosts.querySelectorAll(
+                ".post[data-post-id]"
+            );
+
+            cards.forEach(function (card) {
+                const id = card.getAttribute("data-post-id");
+                card.style.display = ids.has(String(id))
+                    ? ""
+                    : "none";
+            });
+
+            // Informa a quantidade encontrada.
+            if (contador) {
+                contador.textContent = resultados.length === 0
+                    ? "Nenhum profissional ou empresa encontrado."
+                    : resultados.length +
+                      (resultados.length === 1
+                          ? " resultado encontrado."
+                          : " resultados encontrados.");
+            }
+
+            window.resultadosBuscaImpulso = resultados;
+
+            console.log("Resultados da busca:", resultados);
+        }
+
+        function limpar() {
+            campo.value = "";
+
+            [categoria, cidade, servico, plano, avaliacao]
+                .forEach(function (filtro) {
+                    if (filtro) filtro.value = "";
+                });
+
+            filtrar();
+        }
+
+        // Busca pelo botão.
+        if (botaoBuscar) {
+            botaoBuscar.addEventListener("click", function (evento) {
+                evento.preventDefault();
+                filtrar();
+            });
+        }
+
+        // Limpa todos os filtros.
+        if (botaoLimpar) {
+            botaoLimpar.addEventListener("click", function (evento) {
+                evento.preventDefault();
+                limpar();
+            });
+        }
+
+        // Enter pesquisa; demais campos atualizam os resultados.
+        campo.addEventListener("keydown", function (evento) {
+            if (evento.key === "Enter") {
+                evento.preventDefault();
+                filtrar();
+            }
+        });
+
+        campo.addEventListener("input", filtrar);
+
+        [categoria, cidade, servico, plano, avaliacao]
+            .forEach(function (filtro) {
+                if (filtro) {
+                    filtro.addEventListener("change", filtrar);
+                }
+            });
+
+        // Torna a função disponível para testes e atualizações.
+        window.filtrarPerfisImpulso = filtrar;
+
+        filtrar();
+
+        console.log("Sistema de busca do Impulso MKT iniciado.");
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciarBusca,
+            { once: true }
+        );
+    } else {
+        iniciarBusca();
+    }
+})();
+
+
+
+/* =====================================================
+   AVALIAÇÕES COM MEIA ESTRELA - IMPULSO MKT
+===================================================== */
+
+(function () {
+    "use strict";
+
+    const CHAVE_POSTS = "impulsoPosts";
+    const CHAVE_AVALIACOES = "impulsoAvaliacoes";
+
+    function ler(chave) {
+        try {
+            const dados = JSON.parse(localStorage.getItem(chave) || "[]");
+            return Array.isArray(dados) ? dados : [];
+        } catch (erro) {
+            console.error("Erro ao ler dados:", erro);
+            return [];
+        }
+    }
+
+    function salvar(chave, dados) {
+        localStorage.setItem(chave, JSON.stringify(dados));
+    }
+
+    function obterAvaliacoes(idPost) {
+        return ler(CHAVE_AVALIACOES).filter(
+            item => String(item.postId) === String(idPost)
+        );
+    }
+
+    function atualizarMedia(idPost) {
+        const avaliacoes = obterAvaliacoes(idPost);
+        const media = avaliacoes.length
+            ? avaliacoes.reduce((soma, item) => soma + item.nota, 0)
+                / avaliacoes.length
+            : 0;
+
+        const posts = ler(CHAVE_POSTS);
+        const post = posts.find(
+            item => String(item.id) === String(idPost)
+        );
+
+        if (post) {
+            post.avaliacaoMedia = Number(media.toFixed(2));
+            post.totalAvaliacoes = avaliacoes.length;
+            salvar(CHAVE_POSTS, posts);
+        }
+
+        return { media, total: avaliacoes.length };
+    }
+
+    function desenharEstrelas(nota) {
+        return [1, 2, 3, 4, 5].map(numero => {
+            let classe = "";
+
+            if (nota >= numero) {
+                classe = "estrela-cheia";
+            } else if (nota >= numero - 0.5) {
+                classe = "estrela-meia";
+            }
+
+            return `<span class="estrela-visual ${classe}">★</span>`;
+        }).join("");
+    }
+
+    function criarAreaAvaliacao(post) {
+        if (post.querySelector(".avaliacoes-impulso")) return;
+
+        const idPost = post.getAttribute("data-post-id");
+        if (!idPost) return;
+
+        const resumo = atualizarMedia(idPost);
+
+        const area = document.createElement("section");
+        area.className = "avaliacoes-impulso";
+
+        area.innerHTML = `
+            <hr>
+            <h3>Avaliações</h3>
+
+            <div class="resumo-avaliacao">
+                <strong class="media-numero">${resumo.media.toFixed(1)}</strong>
+                <div class="estrelas-resumo">
+                    ${desenharEstrelas(resumo.media)}
+                </div>
+                <span class="total-avaliacoes">
+                    (${resumo.total} ${
+                        resumo.total === 1 ? "avaliação" : "avaliações"
+                    })
+                </span>
+            </div>
+
+            <form class="form-avaliacao" data-post-id="${idPost}">
+                <label>Escolha sua nota:</label>
+
+                <div class="seletor-estrelas">
+                    ${[1, 2, 3, 4, 5].map(numero => `
+                        <div class="estrela-par" aria-label="${numero} estrela(s)">
+                            <button
+                                type="button"
+                                class="estrela-avaliacao metade-esquerda"
+                                data-nota="${numero - 0.5}"
+                                aria-label="${numero - 0.5} estrelas"
+                                aria-pressed="false"
+                            ><span>★</span></button>
+                            <button
+                                type="button"
+                                class="estrela-avaliacao metade-direita"
+                                data-nota="${numero}"
+                                aria-label="${numero} estrelas"
+                                aria-pressed="false"
+                            ><span>★</span></button>
+                        </div>
+                    `).join("")}
+                </div>
+
+                <p class="nota-escolhida">Nenhuma nota selecionada.</p>
+
+                <label>Seu comentário:</label>
+                <textarea
+                    name="comentario"
+                    rows="3"
+                    maxlength="500"
+                    placeholder="Conte como foi sua experiência..."
+                    required
+                ></textarea>
+
+                <button type="submit" class="btn-enviar-avaliacao">
+                    Enviar avaliação
+                </button>
+            </form>
+
+            <div class="lista-comentarios"></div>
+        `;
+
+        post.appendChild(area);
+        mostrarComentarios(area, idPost);
+    }
+
+    function mostrarComentarios(area, idPost) {
+        const lista = area.querySelector(".lista-comentarios");
+        lista.replaceChildren();
+
+        obterAvaliacoes(idPost).slice().reverse().forEach(item => {
+            const bloco = document.createElement("div");
+            bloco.className = "comentario-avaliacao";
+
+            const estrelas = document.createElement("div");
+            estrelas.className = "estrelas-comentario";
+            estrelas.innerHTML = desenharEstrelas(item.nota);
+
+            const nota = document.createElement("p");
+            nota.textContent = item.nota.toFixed(1) + " / 5";
+
+            const comentario = document.createElement("p");
+            comentario.textContent = item.comentario;
+
+            bloco.append(estrelas, nota, comentario);
+            lista.appendChild(bloco);
+        });
+    }
+
+    function atualizarResumo(area, idPost) {
+        const resumo = atualizarMedia(idPost);
+
+        area.querySelector(".media-numero").textContent =
+            resumo.media.toFixed(1);
+
+        area.querySelector(".estrelas-resumo").innerHTML =
+            desenharEstrelas(resumo.media);
+
+        area.querySelector(".total-avaliacoes").textContent =
+            `(${resumo.total} ${
+                resumo.total === 1 ? "avaliação" : "avaliações"
+            })`;
+    }
+
+    function iniciar() {
+        const areaPosts = document.getElementById("areaPosts");
+
+        if (!areaPosts) {
+            console.error("Avaliações: não encontrei #areaPosts.");
+            return;
+        }
+
+        function atualizarAreas() {
+            areaPosts.querySelectorAll(".post[data-post-id]")
+                .forEach(criarAreaAvaliacao);
+        }
+
+        atualizarAreas();
+
+        const observador = new MutationObserver(atualizarAreas);
+        observador.observe(areaPosts, {
+            childList: true,
+            subtree: true
+        });
+
+        areaPosts.addEventListener("click", function (evento) {
+            const botao = evento.target.closest(".estrela-avaliacao");
+            if (!botao) return;
+
+            const formulario = botao.closest(".form-avaliacao");
+            const nota = Number(botao.dataset.nota);
+
+            formulario.dataset.nota = String(nota);
+
+            formulario.querySelectorAll(".estrela-avaliacao")
+                .forEach(estrela => {
+                    const valor = Number(estrela.dataset.nota);
+                    const selecionada = valor <= nota;
+
+                    estrela.classList.toggle("selecionada", selecionada);
+                    estrela.setAttribute(
+                        "aria-pressed",
+                        String(valor === nota)
+                    );
+                });
+
+            formulario.querySelector(".nota-escolhida").textContent =
+                nota.toFixed(1).replace(".", ",") + " de 5 estrelas.";
+        });
+
+        areaPosts.addEventListener("submit", function (evento) {
+            const formulario = evento.target.closest(".form-avaliacao");
+            if (!formulario) return;
+
+            evento.preventDefault();
+
+            const nota = Number(formulario.dataset.nota);
+            const comentario = formulario.elements.comentario.value.trim();
+            const idPost = formulario.dataset.postId;
+
+            if (!nota || nota < 0.5 || nota > 5 || nota * 2 % 1 !== 0) {
+                alert("Escolha uma nota entre 0,5 e 5 estrelas.");
+                return;
+            }
+
+            if (!comentario) {
+                alert("Escreva um comentário antes de enviar.");
+                return;
+            }
+
+            const avaliacoes = ler(CHAVE_AVALIACOES);
+
+            avaliacoes.push({
+                id: Date.now().toString() +
+                    Math.random().toString(36).slice(2),
+                postId: idPost,
+                nota,
+                comentario,
+                data: new Date().toISOString()
+            });
+
+            try {
+                salvar(CHAVE_AVALIACOES, avaliacoes);
+            } catch (erro) {
+                console.error("Erro ao salvar avaliação:", erro);
+                alert("Não foi possível salvar a avaliação.");
+                return;
+            }
+
+            const card = formulario.closest(".post");
+            const area = card.querySelector(".avaliacoes-impulso");
+
+            atualizarResumo(area, idPost);
+            mostrarComentarios(area, idPost);
+
+            formulario.reset();
+            delete formulario.dataset.nota;
+
+            formulario.querySelectorAll(".estrela-avaliacao")
+                .forEach(estrela => {
+                    estrela.classList.remove("selecionada");
+                    estrela.setAttribute("aria-pressed", "false");
+                });
+
+            formulario.querySelector(".nota-escolhida").textContent =
+                "Nenhuma nota selecionada.";
+
+            if (typeof window.filtrarPerfisImpulso === "function") {
+                window.filtrarPerfisImpulso();
+            }
+
+            alert("Avaliação enviada com sucesso!");
+        });
+
+        console.log("Avaliações com meia estrela iniciadas!");
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", iniciar, { once: true });
+    } else {
+        iniciar();
+    }
+})();
