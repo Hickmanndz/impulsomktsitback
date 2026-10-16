@@ -35,6 +35,202 @@
 
     </header>
 
+    <!-- SISTEMA DE BUSCA -->
+<section class="busca-servicos" id="buscaServicos">
+
+    <h2>🔎 Encontre um serviço</h2>
+
+    <p>
+        Procure empresas e profissionais cadastrados no Impulso MKT.
+    </p>
+
+    <div class="filtros-busca">
+
+        <!-- PESQUISA -->
+        <div class="campo-busca">
+            <label for="campoBusca">
+                O que você procura?
+            </label>
+
+            <input
+                type="text"
+                id="campoBusca"
+                placeholder="Ex: pedreiro, eletricista, designer..."
+            >
+        </div>
+
+
+        <!-- CATEGORIA -->
+        <div class="campo-busca">
+            <label for="filtroCategoria">
+                Categoria
+            </label>
+
+            <select id="filtroCategoria">
+
+                <option value="">
+                    Todas as categorias
+                </option>
+
+                <option value="Construção">
+                    Construção
+                </option>
+
+                <option value="Tecnologia">
+                    Tecnologia
+                </option>
+
+                <option value="Marketing">
+                    Marketing
+                </option>
+
+                <option value="Design">
+                    Design
+                </option>
+
+                <option value="Beleza">
+                    Beleza
+                </option>
+
+                <option value="Alimentação">
+                    Alimentação
+                </option>
+
+                <option value="Transporte">
+                    Transporte
+                </option>
+
+                <option value="Outros">
+                    Outros
+                </option>
+
+            </select>
+        </div>
+
+
+        <!-- CIDADE -->
+        <div class="campo-busca">
+            <label for="filtroCidade">
+                Cidade ou região
+            </label>
+
+            <input
+                type="text"
+                id="filtroCidade"
+                placeholder="Ex: Itajaí"
+            >
+        </div>
+
+
+        <!-- SERVIÇO -->
+        <div class="campo-busca">
+            <label for="filtroServico">
+                Tipo de serviço
+            </label>
+
+            <input
+                type="text"
+                id="filtroServico"
+                placeholder="Ex: pedreiro"
+            >
+        </div>
+
+
+        <!-- PLANO -->
+        <div class="campo-busca">
+            <label for="filtroPlano">
+                Plano
+            </label>
+
+            <select id="filtroPlano">
+
+                <option value="">
+                    Todos os planos
+                </option>
+
+                <option value="Premium">
+                    Premium
+                </option>
+
+                <option value="Destaque">
+                    Destaque
+                </option>
+
+                <option value="Básico">
+                    Básico
+                </option>
+
+            </select>
+        </div>
+
+
+        <!-- AVALIAÇÃO -->
+        <div class="campo-busca">
+            <label for="filtroAvaliacao">
+                Avaliação mínima
+            </label>
+
+            <select id="filtroAvaliacao">
+
+                <option value="">
+                    Qualquer avaliação
+                </option>
+
+                <option value="5">
+                    ⭐ 5 estrelas
+                </option>
+
+                <option value="4">
+                    ⭐ 4+ estrelas
+                </option>
+
+                <option value="3">
+                    ⭐ 3+ estrelas
+                </option>
+
+                <option value="2">
+                    ⭐ 2+ estrelas
+                </option>
+
+                <option value="1">
+                    ⭐ 1+ estrela
+                </option>
+
+            </select>
+        </div>
+
+    </div>
+
+
+    <!-- BOTÕES -->
+    <div class="botoes-busca">
+
+        <button
+            type="button"
+            id="btnBuscar"
+        >
+            🔎 Buscar
+        </button>
+
+        <button
+            type="button"
+            id="btnLimparBusca"
+        >
+            Limpar filtros
+        </button>
+
+    </div>
+
+
+    <!-- CONTADOR -->
+    <div
+        id="quantidadeResultados"
+        class="quantidade-resultados"
+    >
+        Nenhuma busca realizada.
+    </div>
+
+</section>
 
 <!-- ================= POSTS PUBLICADOS ================= -->
 
