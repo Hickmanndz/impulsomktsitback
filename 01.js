@@ -194,30 +194,36 @@ const planos = {
 ===================================================== */
 
 function abrirModal(modal) {
-
     if (!modal) {
         return;
     }
 
+    // Fecha outros modais antes de abrir este
+    document.querySelectorAll(".modal").forEach(function (outroModal) {
+        if (outroModal !== modal) {
+            outroModal.classList.remove("ativo");
+            outroModal.style.display = "none";
+        }
+    });
+
     modal.classList.add("ativo");
+    modal.style.display = "flex";
 
-    document.body.style.overflow =
-        "hidden";
-
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 }
 
-
 function fecharModal(modal) {
-
     if (!modal) {
         return;
     }
 
     modal.classList.remove("ativo");
+    modal.style.display = "none";
 
-    document.body.style.overflow =
-        "";
-
+    // Garante que a página volte a rolar
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
 }
 
 
@@ -969,103 +975,6 @@ confirmarCompra.addEventListener(
 );
 
 
-/* =====================================================
-   CRIAR POST
-===================================================== */
-
-botaoCriarPost.addEventListener(
-    "click",
-    function () {
-
-        if (!usuarioLogado) {
-
-            fecharModal(
-                modalConta
-            );
-
-            abrirModal(
-                modalLogin
-            );
-
-            return;
-
-        }
-
-
-        const plano =
-            obterPlano();
-
-
-        if (!plano) {
-
-            alert(
-                "Escolha um plano antes de criar seu post."
-            );
-
-            fecharModal(
-                modalConta
-            );
-
-
-            document
-                .getElementById(
-                    "planos"
-                )
-                .scrollIntoView({
-                    behavior: "smooth"
-                });
-
-
-            return;
-
-        }
-
-
-        /*
-           VERIFICAR LIMITE DE POSTS
-        */
-
-        const meusPosts =
-            posts.filter(
-                function (post) {
-
-                    return (
-                        post.usuarioId ===
-                        usuarioLogado.id
-                    );
-
-                }
-            );
-
-
-        if (
-            meusPosts.length >=
-            plano.limitePosts
-        ) {
-
-            alert(
-                "Você atingiu o limite de " +
-                plano.limitePosts +
-                " posts do seu plano.\n\n" +
-                "Mude de plano para publicar mais."
-            );
-
-            return;
-
-        }
-
-
-        fecharModal(
-            modalConta
-        );
-
-
-        abrirModal(
-            modalPost
-        );
-
-    }
-);
 
 
 /* =====================================================
@@ -1084,189 +993,7 @@ fecharPost.addEventListener(
 );
 
 
-/* =====================================================
-   PUBLICAR POST
-===================================================== */
 
-formPost.addEventListener(
-    "submit",
-    function (evento) {
-
-        evento.preventDefault();
-
-
-        if (!usuarioLogado) {
-
-            return;
-
-        }
-
-
-        const plano =
-            obterPlano();
-
-
-        if (!plano) {
-
-            alert(
-                "Você precisa ter um plano."
-            );
-
-            return;
-
-        }
-
-
-        const meusPosts =
-            posts.filter(
-                function (post) {
-
-                    return (
-                        post.usuarioId ===
-                        usuarioLogado.id
-                    );
-
-                }
-            );
-
-
-        if (
-            meusPosts.length >=
-            plano.limitePosts
-        ) {
-
-            alert(
-                "Limite de posts atingido."
-            );
-
-            return;
-
-        }
-
-
-        const nome =
-            document
-            .getElementById(
-                "postNome"
-            )
-            .value
-            .trim();
-
-
-        const categoria =
-            document
-            .getElementById(
-                "postCategoria"
-            )
-            .value;
-
-
-        const titulo =
-            document
-            .getElementById(
-                "postTitulo"
-            )
-            .value
-            .trim();
-
-
-        const descricao =
-            document
-            .getElementById(
-                "postDescricao"
-            )
-            .value
-            .trim();
-
-
-        const contato =
-            document
-            .getElementById(
-                "postContato"
-            )
-            .value
-            .trim();
-
-
-        const novoPost = {
-
-            id: Date.now(),
-
-            usuarioId:
-                usuarioLogado.id,
-
-            nome:
-                nome,
-
-            categoria:
-                categoria,
-
-            titulo:
-                titulo,
-
-            descricao:
-                descricao,
-
-            contato:
-                contato,
-
-            plano:
-                usuarioLogado.plano,
-
-            destaque:
-                plano.destaque,
-
-            premium:
-                plano.premium,
-
-            data:
-                new Date()
-                .toLocaleDateString(
-                    "pt-BR"
-                )
-
-        };
-
-
-        posts.push(
-            novoPost
-        );
-
-
-        localStorage.setItem(
-            "impulsoPosts",
-            JSON.stringify(
-                posts
-            )
-        );
-
-
-        formPost.reset();
-
-
-        fecharModal(
-            modalPost
-        );
-
-
-        mostrarPosts();
-
-
-        document
-            .getElementById(
-                "posts"
-            )
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-
-        alert(
-            "Post publicado com sucesso!"
-        );
-
-    }
-);
 
 
 /* =====================================================
@@ -1352,6 +1079,9 @@ function mostrarPosts() {
             elemento.className =
                 "post";
 
+
+                elemento.dataset.postId = 
+                String(post.id);
 
             /*
                CLASSES DO PLANO
@@ -1508,64 +1238,7 @@ function escaparHTML(texto) {
    MEUS POSTS
 ===================================================== */
 
-botaoMeusPosts.addEventListener(
-    "click",
-    function () {
 
-        if (!usuarioLogado) {
-            return;
-        }
-
-
-        const meusPosts =
-            posts.filter(
-                function (post) {
-
-                    return (
-                        post.usuarioId ===
-                        usuarioLogado.id
-                    );
-
-                }
-            );
-
-
-        if (
-            meusPosts.length ===
-            0
-        ) {
-
-            alert(
-                "Você ainda não publicou nenhum post."
-            );
-
-            return;
-
-        }
-
-
-        alert(
-            "Você possui " +
-            meusPosts.length +
-            " post(s)."
-        );
-
-
-        fecharModal(
-            modalConta
-        );
-
-
-        document
-            .getElementById(
-                "posts"
-            )
-            .scrollIntoView({
-                behavior: "smooth"
-            });
-
-    }
-);
 
 
 /* =====================================================
@@ -1805,16 +1478,22 @@ function filtrarPerfis() {
 }
 
 
-pesquisa.addEventListener(
-    "input",
-    filtrarPerfis
-);
 
+if (pesquisa) {
+    pesquisa.addEventListener(
+        "input",
+        filtrarPerfis
+    );
+}
 
-filtroCategoria.addEventListener(
-    "change",
-    filtrarPerfis
-);
+// Só conecta o filtro antigo se ele existir
+// e se a pesquisa antiga ainda estiver no HTML.
+if (pesquisa && filtroCategoria) {
+    filtroCategoria.addEventListener(
+        "change",
+        filtrarPerfis
+    );
+}
 
 
 /* =====================================================
@@ -1991,15 +1670,46 @@ console.log(
         }
     }
 
-    function abrirModal(id) {
-        const modal = $(id);
-        if (modal) modal.style.display = "flex";
-    }
+    
+function abrirModal(id) {
+    const modal = $(id);
+    if (!modal) return;
 
-    function fecharModal(id) {
-        const modal = $(id);
-        if (modal) modal.style.display = "none";
+    document.querySelectorAll(".modal").forEach(function (outro) {
+        if (outro !== modal) {
+            outro.classList.remove("ativo");
+            outro.style.display = "none";
+        }
+    });
+
+    modal.classList.add("ativo");
+    modal.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+}
+
+function fecharModal(id) {
+    const modal = $(id);
+    if (!modal) return;
+
+    modal.classList.remove("ativo");
+    modal.style.display = "none";
+
+    const existeOutroAberto = Array.from(
+        document.querySelectorAll(".modal")
+    ).some(function (outro) {
+        return outro !== modal &&
+            outro.classList.contains("ativo") &&
+            getComputedStyle(outro).display !== "none";
+    });
+
+    if (!existeOutroAberto) {
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
     }
+}
+
 
     function atualizarRecursos(plano) {
         const lista = $("listaRecursos");
@@ -2076,16 +1786,6 @@ console.log(
         }
     }
 
-    // Abre a conta pelo botão do cabeçalho.
-    // A abertura do modal de login continua sob responsabilidade
-    // do sistema de login que já existe no projeto.
-    $("abrirLogin")?.addEventListener("click", function () {
-        const usuario = usuarioAtual();
-
-        if (usuario) {
-            atualizarContaUI();
-        }
-    });
 
     // Atualiza perfil quando o modal é aberto.
     $("modalConta")?.addEventListener("click", function (evento) {
@@ -2268,43 +1968,7 @@ console.log(
 
     // CRIAR POST E VER POSTS
     // Reutiliza os botões do sistema de publicações existente.
-    $("botaoCriarPost")?.addEventListener("click", function () {
-        const usuario = usuarioAtual();
 
-        if (!usuario) {
-            alert("Entre na sua conta primeiro.");
-            return;
-        }
-
-        if (!usuario.plano) {
-            alert("Escolha um plano antes de criar publicações.");
-            fecharModal("modalConta");
-            $("planos")?.scrollIntoView({ behavior: "smooth" });
-            return;
-        }
-
-        fecharModal("modalConta");
-        abrirModal("modalPost");
-    });
-
-    $("botaoMeusPosts")?.addEventListener("click", function () {
-        const usuario = usuarioAtual();
-
-        if (!usuario) {
-            alert("Entre na sua conta primeiro.");
-            return;
-        }
-
-        fecharModal("modalConta");
-
-        const secaoPosts = $("posts");
-
-        if (secaoPosts) {
-            secaoPosts.scrollIntoView({ behavior: "smooth" });
-        } else {
-            alert("A seção de publicações não foi encontrada.");
-        }
-    });
 
     // LOGOUT
     $("botaoSair")?.addEventListener("click", function () {
@@ -2422,27 +2086,79 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
         return NOMES_PLANOS[chave] || "Básico";
     }
 
-    function donoDoPost(post, usuario) {
-        const emailPost = post.email || post.usuarioEmail ||
-            post.autorEmail || "";
-
-        return Boolean(
-            usuario &&
-            emailPost &&
-            usuario.email &&
-            emailPost.toLowerCase() === usuario.email.toLowerCase()
-        );
+    
+function donoDoPost(post, usuario) {
+    if (!post || !usuario) {
+        return false;
     }
 
-    function fecharModal(id) {
-        const modal = $(id);
-        if (modal) modal.style.display = "none";
+    // Compatibilidade com os formatos de posts existentes.
+    const emailPost =
+        post.email ||
+        post.usuarioEmail ||
+        post.autorEmail ||
+        "";
+
+    if (
+        emailPost &&
+        usuario.email &&
+        emailPost.toLowerCase() === usuario.email.toLowerCase()
+    ) {
+        return true;
     }
 
-    function abrirModal(id) {
-        const modal = $(id);
-        if (modal) modal.style.display = "flex";
+    // Posts antigos que identificam o dono pelo ID.
+    if (
+        post.usuarioId != null &&
+        usuario.id != null &&
+        String(post.usuarioId) === String(usuario.id)
+    ) {
+        return true;
     }
+
+    return false;
+}
+
+
+function abrirModal(id) {
+    const modal = $(id);
+    if (!modal) return;
+
+    document.querySelectorAll(".modal").forEach(function (outro) {
+        if (outro !== modal) {
+            outro.classList.remove("ativo");
+            outro.style.display = "none";
+        }
+    });
+
+    modal.classList.add("ativo");
+    modal.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+}
+
+function fecharModal(id) {
+    const modal = $(id);
+    if (!modal) return;
+
+    modal.classList.remove("ativo");
+    modal.style.display = "none";
+
+    const existeOutroAberto = Array.from(
+        document.querySelectorAll(".modal")
+    ).some(function (outro) {
+        return outro !== modal &&
+            outro.classList.contains("ativo") &&
+            getComputedStyle(outro).display !== "none";
+    });
+
+    if (!existeOutroAberto) {
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+    }
+}
+
 
     function escaparHTML(valor) {
         return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
@@ -2673,9 +2389,16 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
                 );
             }
 
+           
             area.appendChild(card);
         });
+
+        // Reaplica a busca após recriar os cards.
+        if (typeof window.filtrarPerfisImpulso === "function") {
+            window.filtrarPerfisImpulso();
+        }
     }
+
 
     function editarPost(id) {
         const usuario = usuarioAtual();
@@ -2921,101 +2644,15 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
 
     // Permite que o restante do site atualize os cards após login.
     window.atualizarPostsImpulso = mostrarPosts;
+    // Permite gerenciar posts pela janela "Meus posts".
+    window.editarPostImpulso = editarPost;
+    window.excluirPostImpulso = excluirPost;
 
     // Executa também caso este script seja carregado após o evento DOMContentLoaded.
     mostrarPosts();
 
 })();
 
-
-// =====================================
-// CORREÇÃO: EXCLUIR PUBLICAÇÕES
-// =====================================
-
-document.addEventListener("click", function (evento) {
-    const botao = evento.target.closest(".post-excluir");
-
-    if (!botao) return;
-
-    const card = botao.closest(".post");
-
-    if (!card) {
-        alert("Não foi possível identificar esta publicação.");
-        return;
-    }
-
-    const usuario = JSON.parse(
-        localStorage.getItem("impulsoUsuarioLogado") || "null"
-    );
-
-    if (!usuario || !usuario.email) {
-        alert("Entre na sua conta para excluir uma publicação.");
-        return;
-    }
-
-    const titulo = card.querySelector("h3")?.textContent || "esta publicação";
-
-    if (!confirm(`Deseja realmente excluir "${titulo}"?`)) {
-        return;
-    }
-
-    let posts;
-
-    try {
-        posts = JSON.parse(
-            localStorage.getItem("impulsoPosts") || "[]"
-        );
-
-        if (!Array.isArray(posts)) {
-            throw new Error("Formato inválido");
-        }
-    } catch (erro) {
-        alert("Não foi possível carregar as publicações.");
-        return;
-    }
-
-    // Localiza o post pelo ID armazenado no próprio card.
-    const idPost = card.dataset.postId;
-
-    if (!idPost) {
-        alert(
-            "Esta publicação não possui identificador. " +
-            "Atualize a criação dos posts para salvar o ID no card."
-        );
-        return;
-    }
-
-    const indice = posts.findIndex(post =>
-        String(post.id) === String(idPost) &&
-        String(post.email || post.usuarioEmail || post.autorEmail || "")
-            .toLowerCase() === usuario.email.toLowerCase()
-    );
-
-    if (indice === -1) {
-        alert(
-            "Publicação não encontrada ou você não é o proprietário."
-        );
-        return;
-    }
-
-    posts.splice(indice, 1);
-
-    try {
-        localStorage.setItem("impulsoPosts", JSON.stringify(posts));
-    } catch (erro) {
-        alert("Não foi possível salvar a exclusão.");
-        return;
-    }
-
-    // Atualiza a lista visual.
-    if (typeof window.atualizarPostsImpulso === "function") {
-        window.atualizarPostsImpulso();
-    } else {
-        card.remove();
-    }
-
-    alert("Publicação excluída com sucesso!");
-});
 
 
 
@@ -3297,159 +2934,176 @@ document.addEventListener("DOMContentLoaded", () => {
             return valor;
         }
 
-        function filtrar() {
-            const posts = obterPosts();
+function filtrar() {
+    const posts = obterPosts();
 
-            const termo = normalizar(campo.value);
-            const cat = valorFiltro(categoria);
-            const cid = valorFiltro(cidade);
-            const tipoServico = valorFiltro(servico);
-            const tipoPlano = valorFiltro(plano);
-            const notaMinima = Number(avaliacao?.value || 0);
+    const termo = normalizar(campo.value);
+    const cat = valorFiltro(categoria);
+    const cid = valorFiltro(cidade);
+    const tipoServico = valorFiltro(servico);
+    const tipoPlano = valorFiltro(plano);
+    const notaMinima = Number(avaliacao?.value || 0);
 
-            const resultados = posts.filter(function (post) {
-                const textoCompleto = normalizar([
-                    post.nome,
-                    post.empresa,
-                    post.titulo,
-                    post.descricao,
-                    post.categoria,
-                    post.servico,
-                    post.tipoServico,
-                    post.profissao,
-                    post.especialidade,
-                    post.cidade,
-                    post.regiao,
-                    post.localizacao,
-                    post.bairro,
-                    post.estado
-                ].join(" "));
+    // Verifica se o visitante realizou alguma pesquisa.
+    const pesquisando =
+        termo !== "" ||
+        cat !== "" ||
+        cid !== "" ||
+        tipoServico !== "" ||
+        tipoPlano !== "" ||
+        notaMinima > 0;
 
-                // Busca por nome, empresa, serviço ou descrição.
-                if (termo && !textoCompleto.includes(termo)) {
-                    return false;
-                }
+    const resultados = posts.filter(function (post) {
+        // Identifica o plano do profissional.
+        const planoPost = normalizar(post.plano)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
 
-                // Categoria.
-                if (
-                    cat &&
-                    !normalizar(post.categoria).includes(cat)
-                ) {
-                    return false;
-                }
+        const ehPremium = planoPost === "premium";
 
-                // Cidade ou região.
-                const localizacao = normalizar([
-                    post.cidade,
-                    post.regiao,
-                    post.localizacao,
-                    post.bairro,
-                    post.estado
-                ].join(" "));
-
-                if (cid && !localizacao.includes(cid)) {
-                    return false;
-                }
-
-                // Tipo de serviço.
-                const servicosPost = normalizar([
-                    post.servico,
-                    post.tipoServico,
-                    post.profissao,
-                    post.especialidade,
-                    post.titulo,
-                    post.descricao
-                ].join(" "));
-
-                if (
-                    tipoServico &&
-                    !servicosPost.includes(tipoServico)
-                ) {
-                    return false;
-                }
-
-                // Plano.
-                const planoPost = normalizar(post.plano)
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "");
-
-                const planoFiltro = tipoPlano
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "");
-
-                if (planoFiltro && planoPost !== planoFiltro) {
-                    return false;
-                }
-
-                // Nota mínima. Posts sem avaliação não passam
-                // quando o usuário escolhe uma nota mínima.
-                if (notaMinima > 0) {
-                    const nota = Number(
-                        post.avaliacao ??
-                        post.avaliacaoMedia ??
-                        post.nota ??
-                        post.estrelas ??
-                        0
-                    );
-
-                    if (nota < notaMinima) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-
-            // Premium primeiro, depois Destaque e Básico.
-            const prioridade = {
-                premium: 3,
-                destaque: 2,
-                basico: 1
-            };
-
-            resultados.sort(function (a, b) {
-                const planoA = normalizar(a.plano)
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "");
-
-                const planoB = normalizar(b.plano)
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "");
-
-                return (prioridade[planoB] || 0) -
-                       (prioridade[planoA] || 0);
-            });
-
-            // Exibe somente os cards encontrados.
-            const ids = new Set(
-                resultados.map(post => String(post.id))
-            );
-
-            const cards = areaPosts.querySelectorAll(
-                ".post[data-post-id]"
-            );
-
-            cards.forEach(function (card) {
-                const id = card.getAttribute("data-post-id");
-                card.style.display = ids.has(String(id))
-                    ? ""
-                    : "none";
-            });
-
-            // Informa a quantidade encontrada.
-            if (contador) {
-                contador.textContent = resultados.length === 0
-                    ? "Nenhum profissional ou empresa encontrado."
-                    : resultados.length +
-                      (resultados.length === 1
-                          ? " resultado encontrado."
-                          : " resultados encontrados.");
-            }
-
-            window.resultadosBuscaImpulso = resultados;
-
-            console.log("Resultados da busca:", resultados);
+        // Sem pesquisa, mostra somente os Premium.
+        if (!pesquisando && !ehPremium) {
+            return false;
         }
+
+        const textoCompleto = normalizar([
+            post.nome,
+            post.empresa,
+            post.titulo,
+            post.descricao,
+            post.categoria,
+            post.servico,
+            post.tipoServico,
+            post.profissao,
+            post.especialidade,
+            post.cidade,
+            post.regiao,
+            post.localizacao,
+            post.bairro,
+            post.estado
+        ].join(" "));
+
+        // Pesquisa por nome, empresa, serviço ou descrição.
+        if (termo && !textoCompleto.includes(termo)) {
+            return false;
+        }
+
+        // Categoria.
+        if (
+            cat &&
+            !normalizar(post.categoria).includes(cat)
+        ) {
+            return false;
+        }
+
+        // Cidade ou região.
+        const localizacao = normalizar([
+            post.cidade,
+            post.regiao,
+            post.localizacao,
+            post.bairro,
+            post.estado
+        ].join(" "));
+
+        if (cid && !localizacao.includes(cid)) {
+            return false;
+        }
+
+        // Tipo de serviço.
+        const servicosPost = normalizar([
+            post.servico,
+            post.tipoServico,
+            post.profissao,
+            post.especialidade,
+            post.titulo,
+            post.descricao
+        ].join(" "));
+
+        if (
+            tipoServico &&
+            !servicosPost.includes(tipoServico)
+        ) {
+            return false;
+        }
+
+        // Plano selecionado.
+        const planoFiltro = tipoPlano
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        if (planoFiltro && planoPost !== planoFiltro) {
+            return false;
+        }
+
+        // Nota mínima.
+        if (notaMinima > 0) {
+            const nota = Number(
+                post.avaliacao ??
+                post.avaliacaoMedia ??
+                post.nota ??
+                post.estrelas ??
+                0
+            );
+
+            if (nota < notaMinima) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    // Premium primeiro, depois Destaque e Básico.
+    const prioridade = {
+        premium: 3,
+        destaque: 2,
+        basico: 1
+    };
+
+    resultados.sort(function (a, b) {
+        const planoA = normalizar(a.plano)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        const planoB = normalizar(b.plano)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        return (prioridade[planoB] || 0) -
+               (prioridade[planoA] || 0);
+    });
+
+    // Mostra ou esconde os cards já existentes.
+    const ids = new Set(
+        resultados.map(post => String(post.id))
+    );
+
+    const cards = areaPosts.querySelectorAll(
+        ".post[data-post-id]"
+    );
+
+    cards.forEach(function (card) {
+        const id = card.getAttribute("data-post-id");
+
+        card.style.display = ids.has(String(id))
+            ? ""
+            : "none";
+    });
+
+    // Atualiza a mensagem de resultados.
+    if (contador) {
+        contador.textContent = resultados.length === 0
+            ? "Nenhum profissional ou empresa encontrado."
+            : resultados.length +
+              (resultados.length === 1
+                  ? " resultado encontrado."
+                  : " resultados encontrados.");
+    }
+
+    window.resultadosBuscaImpulso = resultados;
+
+    console.log("Resultados da busca:", resultados);
+}
 
         function limpar() {
             campo.value = "";
@@ -3811,4 +3465,246 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         iniciar();
     }
+})();
+
+
+
+/* =====================================================
+   IMPULSO MKT - JANELA MEUS POSTS
+===================================================== */
+
+(function () {
+    "use strict";
+
+    const botao = document.getElementById("botaoMeusPosts");
+
+    if (!botao) {
+        console.warn("Botão botaoMeusPosts não encontrado.");
+        return;
+    }
+
+    // Cria a janela sem precisar alterar o HTML.
+    const modal = document.createElement("div");
+    modal.className = "modal modal-meus-posts-impulso";
+    modal.id = "modalMeusPostsImpulso";
+
+    modal.innerHTML = `
+        <div class="meus-posts-painel" role="dialog"
+             aria-modal="true" aria-labelledby="tituloMeusPosts">
+
+            <div class="meus-posts-cabecalho">
+                <div>
+                    <h2 id="tituloMeusPosts">📂 Meus posts</h2>
+                    <p>Gerencie suas publicações.</p>
+                </div>
+
+                <button type="button"
+                        class="meus-posts-fechar"
+                        aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="meus-posts-lista"></div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const lista = modal.querySelector(".meus-posts-lista");
+
+    function lerUsuario() {
+        try {
+            return JSON.parse(
+                localStorage.getItem("impulsoUsuarioLogado") || "null"
+            );
+        } catch {
+            return null;
+        }
+    }
+
+    function lerPosts() {
+        try {
+            const posts = JSON.parse(
+                localStorage.getItem("impulsoPosts") || "[]"
+            );
+
+            return Array.isArray(posts) ? posts : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function escapar(texto) {
+        const elemento = document.createElement("span");
+        elemento.textContent = String(texto ?? "");
+        return elemento.innerHTML;
+    }
+
+    function pertenceAoUsuario(post, usuario) {
+        const emailPost = String(
+            post.email || post.usuarioEmail || post.autorEmail || ""
+        ).toLowerCase();
+
+        const emailUsuario = String(usuario.email || "").toLowerCase();
+
+        const mesmoEmail =
+            emailPost !== "" &&
+            emailUsuario !== "" &&
+            emailPost === emailUsuario;
+
+        const mesmoId =
+            post.usuarioId != null &&
+            usuario.id != null &&
+            String(post.usuarioId) === String(usuario.id);
+
+        return mesmoEmail || mesmoId;
+    }
+
+    function fecharMeusPosts() {
+        modal.classList.remove("ativo");
+        modal.style.display = "none";
+
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+    }
+
+    function abrirMeusPosts() {
+        const usuario = lerUsuario();
+
+        if (!usuario) {
+            alert("Entre na sua conta primeiro.");
+            return;
+        }
+
+        renderizarPosts();
+
+        // Fecha os outros modais.
+        document.querySelectorAll(".modal").forEach(function (outro) {
+            if (outro !== modal) {
+                outro.classList.remove("ativo");
+                outro.style.display = "none";
+            }
+        });
+
+        modal.classList.add("ativo");
+        modal.style.display = "flex";
+
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+    }
+
+    function renderizarPosts() {
+        const usuario = lerUsuario();
+
+        if (!usuario) {
+            lista.textContent = "Entre na sua conta para ver seus posts.";
+            return;
+        }
+
+        const meusPosts = lerPosts().filter(function (post) {
+            return pertenceAoUsuario(post, usuario);
+        });
+
+        lista.replaceChildren();
+
+        if (meusPosts.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "meus-posts-vazio";
+
+            vazio.innerHTML = `
+                <div class="meus-posts-icone">📢</div>
+                <h3>Você ainda não tem publicações</h3>
+                <p>Crie seu primeiro post para divulgar seu trabalho.</p>
+            `;
+
+            lista.appendChild(vazio);
+            return;
+        }
+
+        const contador = document.createElement("p");
+        contador.className = "meus-posts-contador";
+        contador.textContent =
+            `${meusPosts.length} publicação(ões) encontrada(s)`;
+
+        lista.appendChild(contador);
+
+        meusPosts.forEach(function (post) {
+            const card = document.createElement("article");
+            card.className = "meus-posts-card";
+
+            const informacoes = document.createElement("div");
+            informacoes.className = "meus-posts-informacoes";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = post.titulo || "Publicação sem título";
+
+            const categoria = document.createElement("p");
+            categoria.textContent =
+                `${post.categoria || "Outros"} · ${post.plano || "Básico"}`;
+
+            const descricao = document.createElement("p");
+            descricao.className = "meus-posts-descricao";
+            descricao.textContent = post.descricao || "";
+
+            informacoes.append(titulo, categoria, descricao);
+
+            const acoes = document.createElement("div");
+            acoes.className = "meus-posts-acoes";
+
+            const editar = document.createElement("button");
+            editar.type = "button";
+            editar.className = "meus-posts-editar";
+            editar.textContent = "✏️ Editar";
+
+            editar.addEventListener("click", function () {
+                if (typeof window.editarPostImpulso !== "function") {
+                    alert("A função de edição não foi encontrada.");
+                    return;
+                }
+
+                window.editarPostImpulso(post.id);
+            });
+
+            const excluir = document.createElement("button");
+            excluir.type = "button";
+            excluir.className = "meus-posts-excluir";
+            excluir.textContent = "🗑️ Excluir";
+
+            excluir.addEventListener("click", function () {
+                if (typeof window.excluirPostImpulso !== "function") {
+                    alert("A função de exclusão não foi encontrada.");
+                    return;
+                }
+
+                window.excluirPostImpulso(post.id);
+
+                // Atualiza a lista depois da confirmação de exclusão.
+                renderizarPosts();
+            });
+
+            acoes.append(editar, excluir);
+            card.append(informacoes, acoes);
+            lista.appendChild(card);
+        });
+    }
+
+    botao.addEventListener("click", abrirMeusPosts);
+
+    modal.querySelector(".meus-posts-fechar")
+        .addEventListener("click", fecharMeusPosts);
+
+    modal.addEventListener("click", function (evento) {
+        if (evento.target === modal) {
+            fecharMeusPosts();
+        }
+    });
+
+    document.addEventListener("keydown", function (evento) {
+        if (evento.key === "Escape" && modal.classList.contains("ativo")) {
+            fecharMeusPosts();
+        }
+    });
+
+    // Permite atualizar a janela após editar uma publicação.
+    window.atualizarMeusPostsImpulso = renderizarPosts;
+
 })();
