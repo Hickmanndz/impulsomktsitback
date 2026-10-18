@@ -996,222 +996,152 @@ fecharPost.addEventListener(
 
 
 
-/* =====================================================
-   MOSTRAR POSTS
-===================================================== */
-
 function mostrarPosts() {
 
+    // Remove os cartões antigos
     const postsExistentes =
-        areaPosts.querySelectorAll(
-            ".post"
-        );
+        areaPosts.querySelectorAll(".post");
 
+    postsExistentes.forEach(function (post) {
+        post.remove();
+    });
 
-    postsExistentes.forEach(
-        function (post) {
-
-            post.remove();
-
-        }
-    );
-
-
+    // Mostra o aviso caso não existam publicações
     if (posts.length === 0) {
-
-        semPosts.style.display =
-            "block";
-
+        semPosts.style.display = "block";
         return;
-
     }
 
+    semPosts.style.display = "none";
 
-    semPosts.style.display =
-        "none";
+    // Premium primeiro, depois Destaque e Básico
+    const postsOrdenados = [...posts].sort(function (a, b) {
 
+        const prioridade = function (post) {
+            if (post.premium) return 3;
+            if (post.destaque) return 2;
+            return 1;
+        };
 
-    /*
-       PRIMEIRO OS POSTS PREMIUM,
-       DEPOIS DESTAQUE,
-       DEPOIS BÁSICO
-    */
+        return prioridade(b) - prioridade(a);
+    });
 
-    const postsOrdenados =
-        [...posts].sort(
-            function (a, b) {
+    postsOrdenados.forEach(function (post) {
 
-                if (
-                    a.premium &&
-                    !b.premium
-                ) {
+        const elemento = document.createElement("div");
 
-                    return -1;
+        elemento.className = "post";
+        elemento.dataset.postId = String(post.id);
 
-                }
+        // Classes visuais dos planos
+        if (post.premium) {
+            elemento.classList.add("post-premium");
+        } else if (post.destaque) {
+            elemento.classList.add("post-destaque");
+        }
 
+        // Selo do plano
+        let selo = "";
 
-                if (
-                    a.destaque &&
-                    !b.destaque
-                ) {
+        if (post.premium) {
+            selo = `
+                <span class="selo-post premium">
+                    ★ PREMIUM
+                </span>
+            `;
+        } else if (post.destaque) {
+            selo = `
+                <span class="selo-post destaque">
+                    ★ DESTAQUE
+                </span>
+            `;
+        }
 
-                    return -1;
-
-                }
-
-
-                return 0;
-
-            }
-        );
-
-
-    postsOrdenados.forEach(
-        function (post) {
-
-            const elemento =
-                document.createElement(
-                    "div"
-                );
-
-
-            elemento.className =
-                "post";
-
-
-                elemento.dataset.postId = 
-                String(post.id);
-
-            /*
-               CLASSES DO PLANO
-            */
-
-            if (post.premium) {
-
-                elemento.classList.add(
-                    "post-premium"
-                );
-
-            } else if (
-                post.destaque
-            ) {
-
-                elemento.classList.add(
-                    "post-destaque"
-                );
-
-            }
-
-
-            const iniciais =
-                post.nome
-                .split(" ")
-                .map(
-                    function (palavra) {
-
-                        return palavra
-                            .charAt(0)
-                            .toUpperCase();
-
-                    }
-                )
-                .slice(0, 2)
-                .join("");
-
-
-            let selo =
-                "";
-
-
-            if (post.premium) {
-
-                selo = `
-                    <span class="selo-post premium">
-                        ★ PREMIUM
-                    </span>
-                `;
-
-            } else if (
-                post.destaque
-            ) {
-
-                selo = `
-                    <span class="selo-post destaque">
-                        ★ DESTAQUE
-                    </span>
-                `;
-
-            }
-
-
-            elemento.innerHTML = `
-
-                ${selo}
-
-                <div class="post-topo">
-
-                    <div class="post-avatar">
-                        ${iniciais}
-                    </div>
-
-                    <div>
-
-                        <div class="post-autor">
-                            ${escaparHTML(
-                                post.nome
-                            )}
-                        </div>
-
-                        <span class="post-categoria">
-                            ${escaparHTML(
-                                post.categoria
-                            )}
-                        </span>
-
-                    </div>
-
+        // Imagem opcional da publicação
+        const imagemHTML = post.imagem
+            ? `
+                <img
+                    class="post-imagem"
+                    src="${escaparHTML(post.imagem)}"
+                    alt="${escaparHTML(post.titulo || post.nome || "Imagem da publicação")}"
+                    loading="lazy"
+                >
+            `
+            : `
+                <div class="post-imagem-vazia">
+                    📢
                 </div>
-
-
-                <h3>
-                    ${escaparHTML(
-                        post.titulo
-                    )}
-                </h3>
-
-
-                <p class="post-descricao">
-                    ${escaparHTML(
-                        post.descricao
-                    )}
-                </p>
-
-
-                <div class="post-contato">
-
-                    <strong>
-                        Contato:
-                    </strong>
-
-                    ${escaparHTML(
-                        post.contato
-                    )}
-
-                </div>
-
             `;
 
+        // Cartão simplificado
+        elemento.innerHTML = `
+            ${selo}
 
-            areaPosts.appendChild(
-                elemento
-            );
+            ${imagemHTML}
 
-        }
-    );
+            <div class="post-conteudo">
 
+                <div class="post-autor">
+                    ${escaparHTML(post.nome || "Profissional")}
+                </div>
+
+                <span class="post-categoria">
+                    ${escaparHTML(post.categoria || "Serviço")}
+                </span>
+
+                <h3>
+                    ${escaparHTML(post.titulo || "Serviço publicado")}
+                </h3>
+
+                <button
+                    type="button"
+                    class="botao-ver-publicacao"
+                    data-abrir-publicacao="${escaparHTML(post.id)}"
+                >
+                    Ver publicação
+                </button>
+
+            </div>
+        `;
+
+        areaPosts.appendChild(elemento);
+    });
 }
 
+
+/* =====================================================
+   ABRIR A PÁGINA DA PUBLICAÇÃO
+===================================================== */
+
+areaPosts.addEventListener("click", function (event) {
+
+    const botao = event.target.closest(
+        "[data-abrir-publicacao]"
+    );
+
+    if (!botao) return;
+
+    const id = botao.dataset.abrirPublicacao;
+
+    if (!id) return;
+
+    // Confirma que a publicação ainda existe
+    const publicacaoExiste = posts.some(function (post) {
+        return String(post.id) === String(id);
+    });
+
+    if (!publicacaoExiste) {
+        alert("Esta publicação não foi encontrada.");
+        return;
+    }
+
+    // Abre os detalhes da empresa
+    window.open(
+        "empresa.html?id=" + encodeURIComponent(id),
+        "_blank"
+    );
+
+});
 
 /* =====================================================
    SEGURANÇA DO TEXTO
@@ -2345,33 +2275,34 @@ function fecharModal(id) {
             `;
 
             // Visualizar publicação incrementa a contagem local.
-            card.querySelector(".post-ver").addEventListener(
-                "click",
-                function () {
-                    const postsAtuais = lerPosts();
-                    const indice = postsAtuais.findIndex(
-                        item => item.id === post.id
-                    );
+           card.querySelector(".post-ver").addEventListener(
+    "click",
+    function () {
+        const postsAtuais = lerPosts();
 
-                    if (indice < 0) return;
+        const indice = postsAtuais.findIndex(
+            item => item.id === post.id
+        );
 
-                    postsAtuais[indice].visualizacoes =
-                        (Number(postsAtuais[indice].visualizacoes) || 0) + 1;
+        if (indice < 0) return;
 
-                    if (!salvarPosts(postsAtuais)) return;
+        // Aumenta as visualizações
+        postsAtuais[indice].visualizacoes =
+            (Number(postsAtuais[indice].visualizacoes) || 0) + 1;
 
-                    card.querySelector(".contador-views").textContent =
-                        postsAtuais[indice].visualizacoes;
+        if (!salvarPosts(postsAtuais)) return;
 
-                    alert(
-                        titulo + "\n\n" +
-                        descricao + "\n\n" +
-                        "Visualizações: " +
-                        postsAtuais[indice].visualizacoes
-                    );
-                }
-            );
+        // Atualiza o contador na publicação
+        card.querySelector(".contador-views").textContent =
+            postsAtuais[indice].visualizacoes;
 
+        // Abre a página detalhada em uma NOVA GUIA
+        window.open(
+            `empresa.html?id=${encodeURIComponent(post.id)}`,
+            "_blank"
+        );
+    }
+);
             // Somente o dono pode editar.
             if (meuPost) {
                 card.querySelector(".post-editar").addEventListener(

@@ -1,0 +1,590 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Empresa | Impulso MKT</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b0b0f;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* CABEÇALHO */
+
+        header {
+            width: 100%;
+            padding: 20px 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: #111116;
+            border-bottom: 1px solid #29202f;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #9b4dff;
+        }
+
+        .botao-voltar {
+            border: none;
+            background: #1b1720;
+            color: #ffffff;
+
+            padding: 10px 18px;
+            border-radius: 8px;
+
+            cursor: pointer;
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .botao-voltar:hover {
+            background: #9b4dff;
+        }
+
+        /* CONTEÚDO */
+
+        main {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+
+        .empresa-container {
+            background: #111116;
+            border: 1px solid #29202f;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        /* IMAGEM */
+
+        .empresa-imagem {
+            width: 100%;
+            height: 350px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #18151c;
+        }
+
+        .empresa-imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sem-imagem {
+            color: #777;
+            font-size: 18px;
+        }
+
+        /* INFORMAÇÕES */
+
+        .empresa-conteudo {
+            padding: 35px;
+        }
+
+        .empresa-categoria {
+            display: inline-block;
+
+            background: #241633;
+            color: #b875ff;
+
+            padding: 7px 13px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .empresa-titulo {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .empresa-descricao {
+            color: #c8c8c8;
+            line-height: 1.7;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ESTATÍSTICAS */
+
+        .empresa-estatisticas {
+            display: flex;
+            gap: 25px;
+
+            padding: 18px 0;
+
+            border-top: 1px solid #29202f;
+            border-bottom: 1px solid #29202f;
+
+            margin-bottom: 30px;
+
+            color: #cfcfcf;
+        }
+
+        /* CONTATO */
+
+        .empresa-contato {
+            margin-top: 25px;
+        }
+
+        .empresa-contato h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .contato-texto {
+            color: #c8c8c8;
+            margin-bottom: 20px;
+        }
+
+        .botao-whatsapp {
+            display: inline-block;
+
+            padding: 13px 22px;
+
+            border-radius: 8px;
+
+            background: #25d366;
+            color: #ffffff;
+
+            text-decoration: none;
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        .botao-whatsapp:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* PLANO */
+
+        .empresa-plano {
+            margin-top: 30px;
+            padding: 20px;
+
+            background: #18131f;
+            border: 1px solid #30203e;
+
+            border-radius: 10px;
+        }
+
+        .empresa-plano strong {
+            color: #b875ff;
+        }
+
+        /* ERRO */
+
+        .erro {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .erro h1 {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .erro p {
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+
+        .erro button {
+            border: none;
+            background: #9b4dff;
+            color: white;
+
+            padding: 12px 20px;
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+        /* CELULAR */
+
+        @media (max-width: 700px) {
+
+            .empresa-imagem {
+                height: 250px;
+            }
+
+            .empresa-conteudo {
+                padding: 22px;
+            }
+
+            .empresa-titulo {
+                font-size: 28px;
+            }
+
+            .empresa-estatisticas {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo">
+            IMPULSO MKT
+        </div>
+
+        <button class="botao-voltar" onclick="voltarParaInicio()">
+            ← Voltar
+        </button>
+
+    </header>
+
+
+    <main id="conteudoEmpresa">
+
+        <!-- O JavaScript preencherá esta área -->
+
+    </main>
+
+
+    <script>
+
+        /* ==========================================
+           PEGAR ID DA PUBLICAÇÃO NA URL
+        ========================================== */
+
+        const parametros = new URLSearchParams(
+            window.location.search
+        );
+
+        const idPost = parametros.get("id");
+
+
+        /* ==========================================
+           LER PUBLICAÇÕES
+        ========================================== */
+
+        function lerPosts() {
+
+            try {
+
+                return JSON.parse(
+                    localStorage.getItem("impulsoPosts")
+                ) || [];
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao carregar publicações:",
+                    erro
+                );
+
+                return [];
+
+            }
+
+        }
+
+
+        /* ==========================================
+           ESCAPAR HTML
+        ========================================== */
+
+        function escaparHTML(texto) {
+
+            const div = document.createElement("div");
+
+            div.textContent = texto ?? "";
+
+            return div.innerHTML;
+
+        }
+
+
+        /* ==========================================
+           CARREGAR EMPRESA
+        ========================================== */
+
+        function carregarEmpresa() {
+
+            const posts = lerPosts();
+
+            const post = posts.find(
+                item => String(item.id) === String(idPost)
+            );
+
+            const conteudo =
+                document.getElementById("conteudoEmpresa");
+
+
+            /* PUBLICAÇÃO NÃO ENCONTRADA */
+
+            if (!post) {
+
+                conteudo.innerHTML = `
+
+                    <div class="erro">
+
+                        <h1>
+                            Publicação não encontrada
+                        </h1>
+
+                        <p>
+                            Essa publicação pode ter sido removida
+                            ou o endereço pode estar incorreto.
+                        </p>
+
+                        <button onclick="voltarParaInicio()">
+                            Voltar para o início
+                        </button>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            /* ==========================================
+               DADOS
+            ========================================== */
+
+            const titulo =
+                post.titulo || "Empresa sem nome";
+
+            const categoria =
+                post.categoria || "Serviço";
+
+            const descricao =
+                post.descricao ||
+                "Esta empresa ainda não adicionou uma descrição.";
+
+            const contato =
+                post.contato || "";
+
+            const imagem =
+                post.imagem || "";
+
+            const plano =
+                post.plano || "Básico";
+
+            const visualizacoes =
+                Number(post.visualizacoes) || 0;
+
+
+            /* ==========================================
+               WHATSAPP
+            ========================================== */
+
+            let whatsappHTML = "";
+
+            if (contato) {
+
+                let numero =
+                    contato.replace(/\D/g, "");
+
+                if (numero.length >= 10) {
+
+                    if (!numero.startsWith("55")) {
+                        numero = "55" + numero;
+                    }
+
+                    const mensagem =
+                        encodeURIComponent(
+                            `Olá! Vi a publicação da ${titulo} no Impulso MKT e gostaria de saber mais sobre seus serviços.`
+                        );
+
+                    whatsappHTML = `
+
+                        <a
+                            class="botao-whatsapp"
+                            href="https://wa.me/${numero}?text=${mensagem}"
+                            target="_blank"
+                        >
+                            💬 Falar no WhatsApp
+                        </a>
+
+                    `;
+
+                }
+
+            }
+
+
+            /* ==========================================
+               IMAGEM
+            ========================================== */
+
+            let imagemHTML = "";
+
+            if (imagem) {
+
+                imagemHTML = `
+
+                    <img
+                        src="${escaparHTML(imagem)}"
+                        alt="${escaparHTML(titulo)}"
+                    >
+
+                `;
+
+            } else {
+
+                imagemHTML = `
+
+                    <span class="sem-imagem">
+                        Esta empresa não possui imagem.
+                    </span>
+
+                `;
+
+            }
+
+
+            /* ==========================================
+               MONTAR PÁGINA
+            ========================================== */
+
+            conteudo.innerHTML = `
+
+                <div class="empresa-container">
+
+                    <div class="empresa-imagem">
+
+                        ${imagemHTML}
+
+                    </div>
+
+
+                    <div class="empresa-conteudo">
+
+                        <span class="empresa-categoria">
+
+                            ${escaparHTML(categoria)}
+
+                        </span>
+
+
+                        <h1 class="empresa-titulo">
+
+                            ${escaparHTML(titulo)}
+
+                        </h1>
+
+
+                        <p class="empresa-descricao">
+
+                            ${escaparHTML(descricao)}
+
+                        </p>
+
+
+                        <div class="empresa-estatisticas">
+
+                            <span>
+                                👁️ ${visualizacoes}
+                                visualizações
+                            </span>
+
+                            <span>
+                                ⭐ Avaliações
+                            </span>
+
+                        </div>
+
+
+                        <div class="empresa-contato">
+
+                            <h2>
+                                Entre em contato
+                            </h2>
+
+                            <p class="contato-texto">
+
+                                ${contato
+                                    ? "Entre em contato diretamente com esta empresa:"
+                                    : "Esta empresa não informou um contato."
+                                }
+
+                            </p>
+
+                            ${whatsappHTML}
+
+                        </div>
+
+
+                        <div class="empresa-plano">
+
+                            Plano da publicação:
+                            <strong>
+                                ${escaparHTML(plano)}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            /* ==========================================
+               ATUALIZAR TÍTULO DA GUIA
+            ========================================== */
+
+            document.title =
+                `${titulo} | Impulso MKT`;
+
+        }
+
+
+        /* ==========================================
+           BOTÃO VOLTAR
+        ========================================== */
+
+        function voltarParaInicio() {
+
+            window.close();
+
+        }
+
+
+        /* ==========================================
+           INICIAR
+        ========================================== */
+
+        carregarEmpresa();
+
+    </script>
+
+</body>
+
+</html>
