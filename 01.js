@@ -505,6 +505,9 @@ function salvarUsuarios() {
             usuarios
         )
     );
+    atualizarCategoriasImpulso();
+    document.getElementById("filtroCategoria")
+    ?.dispatchEvent(new Event("change"));
 
 }
 
@@ -1984,23 +1987,42 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
         }
     }
 
-    function salvarPosts(posts) {
-        try {
-            localStorage.setItem(
-                "impulsoPosts",
-                JSON.stringify(posts)
-            );
+  
+function salvarPosts(posts) {
+    try {
+        localStorage.setItem(
+            "impulsoPosts",
+            JSON.stringify(posts)
+        );
 
-            return true;
-        } catch {
-            alert(
-                "Não foi possível salvar as publicações. " +
-                "A imagem pode ser grande demais para o armazenamento local."
-            );
-
-            return false;
+        // Atualiza as categorias assim que os posts forem salvos.
+        if (typeof window.atualizarCategoriasImpulso === "function") {
+            window.atualizarCategoriasImpulso();
         }
+
+        // Executa novamente a busca com os dados atualizados.
+        if (typeof window.filtrarPerfisImpulso === "function") {
+            window.filtrarPerfisImpulso();
+        }
+
+        // Atualiza o limite de publicações do plano.
+        if (typeof window.atualizarLimitePostsImpulso === "function") {
+            window.atualizarLimitePostsImpulso();
+        }
+
+        return true;
+    } catch (erro) {
+        console.error("Erro ao salvar publicações:", erro);
+
+        alert(
+            "Não foi possível salvar as publicações. " +
+            "A imagem pode ser grande demais para o armazenamento local."
+        );
+
+        return false;
     }
+}
+
 
     function nomePlano(usuario) {
         if (!usuario || !usuario.plano) return "";
@@ -2216,19 +2238,7 @@ function fecharModal(id) {
                     ? "★ DESTAQUE"
                     : "PLANO BÁSICO";
 
-            const numeroWhatsApp = telefoneWhatsApp(contato);
-
-            const contatoHTML = numeroWhatsApp
-                ? `<a class="post-whatsapp"
-                      href="https://wa.me/${numeroWhatsApp}"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Conversar pelo WhatsApp
-                   </a>`
-                : `<p class="post-descricao">
-                       Contato indisponível ou número inválido.
-                   </p>`;
-
+            
             card.innerHTML = `
                 ${imagemDoPost(post)}
 
@@ -2246,9 +2256,7 @@ function fecharModal(id) {
 
                 <h3>${escaparHTML(titulo)}</h3>
 
-                <p class="post-descricao">
-                    ${escaparHTML(descricao)}
-                </p>
+             
 
                 <div class="post-estatisticas">
                     👁️ <span class="contador-views">${views}</span>
@@ -2260,8 +2268,7 @@ function fecharModal(id) {
                         Ver publicação
                     </button>
 
-                    ${contatoHTML}
-
+        
                     ${meuPost ? `
                         <button type="button" class="post-editar">
                             ✏️ Editar publicação
@@ -2448,6 +2455,18 @@ function fecharModal(id) {
 
     // CRIAR OU SALVAR ALTERAÇÕES
     $("formPost")?.addEventListener("submit", function (evento) {
+        
+        if (verificarConteudoInadequado(event.currentTarget)) {
+    event.preventDefault();
+
+    alert(
+        "⚠️ Publicação não permitida!\n\n" +
+        "O Impulso MKT não permite conteúdo sexual explícito " +
+        "ou anúncios inadequados. Revise os campos e tente novamente."
+    );
+
+    return;
+}
         evento.preventDefault();
 
         const usuario = usuarioAtual();
@@ -3102,305 +3121,6 @@ function filtrar() {
 
 
 /* =====================================================
-   AVALIAÇÕES COM MEIA ESTRELA - IMPULSO MKT
-===================================================== */
-
-(function () {
-    "use strict";
-
-    const CHAVE_POSTS = "impulsoPosts";
-    const CHAVE_AVALIACOES = "impulsoAvaliacoes";
-
-    function ler(chave) {
-        try {
-            const dados = JSON.parse(localStorage.getItem(chave) || "[]");
-            return Array.isArray(dados) ? dados : [];
-        } catch (erro) {
-            console.error("Erro ao ler dados:", erro);
-            return [];
-        }
-    }
-
-    function salvar(chave, dados) {
-        localStorage.setItem(chave, JSON.stringify(dados));
-    }
-
-    function obterAvaliacoes(idPost) {
-        return ler(CHAVE_AVALIACOES).filter(
-            item => String(item.postId) === String(idPost)
-        );
-    }
-
-    function atualizarMedia(idPost) {
-        const avaliacoes = obterAvaliacoes(idPost);
-        const media = avaliacoes.length
-            ? avaliacoes.reduce((soma, item) => soma + item.nota, 0)
-                / avaliacoes.length
-            : 0;
-
-        const posts = ler(CHAVE_POSTS);
-        const post = posts.find(
-            item => String(item.id) === String(idPost)
-        );
-
-        if (post) {
-            post.avaliacaoMedia = Number(media.toFixed(2));
-            post.totalAvaliacoes = avaliacoes.length;
-            salvar(CHAVE_POSTS, posts);
-        }
-
-        return { media, total: avaliacoes.length };
-    }
-
-    function desenharEstrelas(nota) {
-        return [1, 2, 3, 4, 5].map(numero => {
-            let classe = "";
-
-            if (nota >= numero) {
-                classe = "estrela-cheia";
-            } else if (nota >= numero - 0.5) {
-                classe = "estrela-meia";
-            }
-
-            return `<span class="estrela-visual ${classe}">★</span>`;
-        }).join("");
-    }
-
-    function criarAreaAvaliacao(post) {
-        if (post.querySelector(".avaliacoes-impulso")) return;
-
-        const idPost = post.getAttribute("data-post-id");
-        if (!idPost) return;
-
-        const resumo = atualizarMedia(idPost);
-
-        const area = document.createElement("section");
-        area.className = "avaliacoes-impulso";
-
-        area.innerHTML = `
-            <hr>
-            <h3>Avaliações</h3>
-
-            <div class="resumo-avaliacao">
-                <strong class="media-numero">${resumo.media.toFixed(1)}</strong>
-                <div class="estrelas-resumo">
-                    ${desenharEstrelas(resumo.media)}
-                </div>
-                <span class="total-avaliacoes">
-                    (${resumo.total} ${
-                        resumo.total === 1 ? "avaliação" : "avaliações"
-                    })
-                </span>
-            </div>
-
-            <form class="form-avaliacao" data-post-id="${idPost}">
-                <label>Escolha sua nota:</label>
-
-                <div class="seletor-estrelas">
-                    ${[1, 2, 3, 4, 5].map(numero => `
-                        <div class="estrela-par" aria-label="${numero} estrela(s)">
-                            <button
-                                type="button"
-                                class="estrela-avaliacao metade-esquerda"
-                                data-nota="${numero - 0.5}"
-                                aria-label="${numero - 0.5} estrelas"
-                                aria-pressed="false"
-                            ><span>★</span></button>
-                            <button
-                                type="button"
-                                class="estrela-avaliacao metade-direita"
-                                data-nota="${numero}"
-                                aria-label="${numero} estrelas"
-                                aria-pressed="false"
-                            ><span>★</span></button>
-                        </div>
-                    `).join("")}
-                </div>
-
-                <p class="nota-escolhida">Nenhuma nota selecionada.</p>
-
-                <label>Seu comentário:</label>
-                <textarea
-                    name="comentario"
-                    rows="3"
-                    maxlength="500"
-                    placeholder="Conte como foi sua experiência..."
-                    required
-                ></textarea>
-
-                <button type="submit" class="btn-enviar-avaliacao">
-                    Enviar avaliação
-                </button>
-            </form>
-
-            <div class="lista-comentarios"></div>
-        `;
-
-        post.appendChild(area);
-        mostrarComentarios(area, idPost);
-    }
-
-    function mostrarComentarios(area, idPost) {
-        const lista = area.querySelector(".lista-comentarios");
-        lista.replaceChildren();
-
-        obterAvaliacoes(idPost).slice().reverse().forEach(item => {
-            const bloco = document.createElement("div");
-            bloco.className = "comentario-avaliacao";
-
-            const estrelas = document.createElement("div");
-            estrelas.className = "estrelas-comentario";
-            estrelas.innerHTML = desenharEstrelas(item.nota);
-
-            const nota = document.createElement("p");
-            nota.textContent = item.nota.toFixed(1) + " / 5";
-
-            const comentario = document.createElement("p");
-            comentario.textContent = item.comentario;
-
-            bloco.append(estrelas, nota, comentario);
-            lista.appendChild(bloco);
-        });
-    }
-
-    function atualizarResumo(area, idPost) {
-        const resumo = atualizarMedia(idPost);
-
-        area.querySelector(".media-numero").textContent =
-            resumo.media.toFixed(1);
-
-        area.querySelector(".estrelas-resumo").innerHTML =
-            desenharEstrelas(resumo.media);
-
-        area.querySelector(".total-avaliacoes").textContent =
-            `(${resumo.total} ${
-                resumo.total === 1 ? "avaliação" : "avaliações"
-            })`;
-    }
-
-    function iniciar() {
-        const areaPosts = document.getElementById("areaPosts");
-
-        if (!areaPosts) {
-            console.error("Avaliações: não encontrei #areaPosts.");
-            return;
-        }
-
-        function atualizarAreas() {
-            areaPosts.querySelectorAll(".post[data-post-id]")
-                .forEach(criarAreaAvaliacao);
-        }
-
-        atualizarAreas();
-
-        const observador = new MutationObserver(atualizarAreas);
-        observador.observe(areaPosts, {
-            childList: true,
-            subtree: true
-        });
-
-        areaPosts.addEventListener("click", function (evento) {
-            const botao = evento.target.closest(".estrela-avaliacao");
-            if (!botao) return;
-
-            const formulario = botao.closest(".form-avaliacao");
-            const nota = Number(botao.dataset.nota);
-
-            formulario.dataset.nota = String(nota);
-
-            formulario.querySelectorAll(".estrela-avaliacao")
-                .forEach(estrela => {
-                    const valor = Number(estrela.dataset.nota);
-                    const selecionada = valor <= nota;
-
-                    estrela.classList.toggle("selecionada", selecionada);
-                    estrela.setAttribute(
-                        "aria-pressed",
-                        String(valor === nota)
-                    );
-                });
-
-            formulario.querySelector(".nota-escolhida").textContent =
-                nota.toFixed(1).replace(".", ",") + " de 5 estrelas.";
-        });
-
-        areaPosts.addEventListener("submit", function (evento) {
-            const formulario = evento.target.closest(".form-avaliacao");
-            if (!formulario) return;
-
-            evento.preventDefault();
-
-            const nota = Number(formulario.dataset.nota);
-            const comentario = formulario.elements.comentario.value.trim();
-            const idPost = formulario.dataset.postId;
-
-            if (!nota || nota < 0.5 || nota > 5 || nota * 2 % 1 !== 0) {
-                alert("Escolha uma nota entre 0,5 e 5 estrelas.");
-                return;
-            }
-
-            if (!comentario) {
-                alert("Escreva um comentário antes de enviar.");
-                return;
-            }
-
-            const avaliacoes = ler(CHAVE_AVALIACOES);
-
-            avaliacoes.push({
-                id: Date.now().toString() +
-                    Math.random().toString(36).slice(2),
-                postId: idPost,
-                nota,
-                comentario,
-                data: new Date().toISOString()
-            });
-
-            try {
-                salvar(CHAVE_AVALIACOES, avaliacoes);
-            } catch (erro) {
-                console.error("Erro ao salvar avaliação:", erro);
-                alert("Não foi possível salvar a avaliação.");
-                return;
-            }
-
-            const card = formulario.closest(".post");
-            const area = card.querySelector(".avaliacoes-impulso");
-
-            atualizarResumo(area, idPost);
-            mostrarComentarios(area, idPost);
-
-            formulario.reset();
-            delete formulario.dataset.nota;
-
-            formulario.querySelectorAll(".estrela-avaliacao")
-                .forEach(estrela => {
-                    estrela.classList.remove("selecionada");
-                    estrela.setAttribute("aria-pressed", "false");
-                });
-
-            formulario.querySelector(".nota-escolhida").textContent =
-                "Nenhuma nota selecionada.";
-
-            if (typeof window.filtrarPerfisImpulso === "function") {
-                window.filtrarPerfisImpulso();
-            }
-
-            alert("Avaliação enviada com sucesso!");
-        });
-
-        console.log("Avaliações com meia estrela iniciadas!");
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", iniciar, { once: true });
-    } else {
-        iniciar();
-    }
-})();
-
-
-
-/* =====================================================
    IMPULSO MKT - JANELA MEUS POSTS
 ===================================================== */
 
@@ -3639,3 +3359,207 @@ function filtrar() {
     window.atualizarMeusPostsImpulso = renderizarPosts;
 
 })();
+
+
+function atualizarCategoriasImpulso() {
+    const filtroCategoria = document.getElementById("filtroCategoria");
+
+    if (!filtroCategoria) return;
+
+    const posts = JSON.parse(
+        localStorage.getItem("impulsoPosts") || "[]"
+    );
+
+    // Guarda a categoria atualmente selecionada
+    const categoriaSelecionada = filtroCategoria.value;
+
+    // Extrai categorias existentes e elimina duplicatas
+    const categorias = [
+        ...new Set(
+            posts
+                .map(post => (post.categoria || "").trim())
+                .filter(categoria => categoria.length > 0)
+                .map(categoria => ({
+                    original: categoria,
+                    normalizada: categoria.toLocaleLowerCase("pt-BR")
+                }))
+                .reduce((lista, categoria) => {
+                    if (!lista.some(
+                        item => item.normalizada === categoria.normalizada
+                    )) {
+                        lista.push(categoria);
+                    }
+                    return lista;
+                }, [])
+                .map(categoria => categoria.original)
+        )
+    ].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+    // Reconstrói o filtro
+    filtroCategoria.innerHTML =
+        '<option value="">Todas as categorias</option>';
+
+    categorias.forEach(categoria => {
+        const opcao = document.createElement("option");
+        opcao.value = categoria;
+        opcao.textContent = categoria;
+        filtroCategoria.appendChild(opcao);
+    });
+
+    // Mantém a seleção, se a categoria ainda existir
+    const categoriaMantida = categorias.find(
+        categoria =>
+            categoria.toLocaleLowerCase("pt-BR") ===
+            categoriaSelecionada.toLocaleLowerCase("pt-BR")
+    );
+
+    if (categoriaMantida) {
+        filtroCategoria.value = categoriaMantida;
+    }
+    window.atualizarCategoriasImpulso = atualizarCategoriasImpulso;
+}
+
+// Atualiza quando o HTML estiver carregado
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        atualizarCategoriasImpulso
+    );
+} else {
+    atualizarCategoriasImpulso();
+}
+
+
+
+/* IMPULSO MKT — FILTRO DE CONTEÚDO INADEQUADO */
+
+
+/* IMPULSO MKT — FILTRO AMPLIADO DE CONTEÚDO */
+
+function verificarConteudoInadequado(formulario) {
+    const normalizar = texto =>
+        String(texto || "")
+            .toLocaleLowerCase("pt-BR")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim()
+            .replace(/\s+/g, " ");
+
+    // Expressões inadequadas: é possível acrescentar outras aqui.
+    const expressoesProibidas = [
+        // Conteúdo sexual explícito
+        "sexo explicito",
+        "servicos sexuais",
+        "servico sexual",
+        "exploracao sexual",
+        "conteudo pornografico",
+        "filme pornografico",
+        "venda de nudes",
+
+        // Violência e ameaças
+        "ameaca de morte",
+        "matar uma pessoa",
+        "contratar assassino",
+        "incentivo ao suicidio",
+        "tortura de pessoas",
+
+        // Drogas e atividades ilegais
+        "venda de drogas ilicitas",
+        "trafico de drogas",
+        "venda de armas ilegais",
+        "documentos falsos",
+        "dinheiro falso",
+
+        // Golpes e fraudes
+        "golpe financeiro",
+        "fraude bancaria",
+        "roubo de identidade",
+        "roubar senhas",
+        "hackear contas",
+        "dinheiro garantido sem fazer nada",
+
+        // Assédio e discriminação
+        "ameacar uma pessoa",
+        "perseguir uma pessoa",
+        "discurso de odio"
+    ];
+
+    // Palavras isoladas que indicam possível conteúdo inadequado.
+    // Evite termos ambíguos para reduzir bloqueios indevidos.
+    const palavrasProibidas = [
+        // Sexual
+        "pornografia",
+        "pornografico",
+        "pornografica",
+        "prostituicao",
+        "nudes",
+        "estupro",
+        "estuprar",
+
+        // Ofensas e palavrões comuns
+        "caralho",
+        "porra",
+        "merda",
+        "buceta",
+        "putaria",
+        "foder",
+        "fodase",
+        "arrombado",
+        "arrombada",
+
+        // Violência
+        "assassinar",
+        "assassinato",
+        "tortura",
+        "decapitar",
+
+        // Atividades ilegais
+        "estelionato",
+        "extorsao",
+        "sequestro"
+    ];
+
+    if (!formulario || !formulario.elements) {
+        return false;
+    }
+
+    // Analisa os campos textuais do formulário.
+    const campos = Array.from(formulario.elements).filter(campo => {
+        if (campo.disabled) return false;
+
+        return (
+            campo.tagName === "TEXTAREA" ||
+            campo.tagName === "SELECT" ||
+            ["text", "search", "url", "email", "tel"].includes(campo.type)
+        );
+    });
+
+    for (const campo of campos) {
+        const texto = normalizar(campo.value);
+
+        if (!texto) continue;
+
+        // Procura expressões completas.
+        const encontrouExpressao = expressoesProibidas.some(expressao =>
+            texto.includes(normalizar(expressao))
+        );
+
+        if (encontrouExpressao) {
+            return true;
+        }
+
+        // Procura palavras isoladas, sem bloquear partes de outras palavras.
+        const palavras = new Set(texto.split(" "));
+
+        const encontrouPalavra = palavrasProibidas.some(palavra =>
+            palavras.has(normalizar(palavra))
+        );
+
+        if (encontrouPalavra) {
+            return true;
+        }
+    }
+
+    return false;
+}

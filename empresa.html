@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -145,10 +144,219 @@
             color: #cfcfcf;
         }
 
+        /* AVALIAÇÕES */
+
+        .empresa-avaliacoes {
+            margin-top: 35px;
+            padding-top: 30px;
+            border-top: 1px solid #29202f;
+        }
+
+        .empresa-avaliacoes h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .avaliacao-resumo {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+
+            padding: 20px;
+
+            background: #18131f;
+            border: 1px solid #30203e;
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+        }
+
+        .avaliacao-media {
+            font-size: 34px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .avaliacao-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .avaliacao-info span {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* ESTRELAS */
+
+        .estrelas {
+            position: relative;
+            display: inline-block;
+            font-size: 24px;
+            letter-spacing: 2px;
+            line-height: 1;
+            width: max-content;
+        }
+
+        .estrelas-base {
+            color: #444;
+        }
+
+        .estrelas-preenchidas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            color: #f5b301;
+        }
+
+        /* FORMULÁRIO */
+
+        .form-avaliacao {
+            background: #151219;
+            border: 1px solid #29202f;
+            border-radius: 12px;
+
+            padding: 22px;
+            margin-bottom: 30px;
+        }
+
+        .form-avaliacao h3 {
+            margin-bottom: 18px;
+            font-size: 19px;
+        }
+
+        .campo-avaliacao {
+            margin-bottom: 18px;
+        }
+
+        .campo-avaliacao label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .campo-avaliacao input,
+        .campo-avaliacao textarea {
+            width: 100%;
+
+            background: #0d0d11;
+            color: white;
+
+            border: 1px solid #30203e;
+            border-radius: 8px;
+
+            padding: 12px;
+            outline: none;
+        }
+
+        .campo-avaliacao input:focus,
+        .campo-avaliacao textarea:focus {
+            border-color: #9b4dff;
+        }
+
+        .campo-avaliacao textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* NOTA */
+
+        .nota-selecao {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nota-visual {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #valorNota {
+            color: #f5b301;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        #notaAvaliacao {
+            width: 100%;
+            accent-color: #9b4dff;
+            cursor: pointer;
+        }
+
+        .botao-avaliar {
+            border: none;
+            background: #9b4dff;
+            color: white;
+
+            padding: 12px 20px;
+            border-radius: 8px;
+
+            cursor: pointer;
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        .botao-avaliar:hover {
+            background: #7f35dc;
+            transform: translateY(-1px);
+        }
+
+        /* LISTA DE AVALIAÇÕES */
+
+        .lista-avaliacoes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .avaliacao-item {
+            background: #151219;
+            border: 1px solid #29202f;
+            border-radius: 12px;
+
+            padding: 18px;
+        }
+
+        .avaliacao-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .avaliacao-nome {
+            font-weight: bold;
+        }
+
+        .avaliacao-data {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .avaliacao-comentario {
+            color: #c8c8c8;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .sem-avaliacoes {
+            color: #888;
+            padding: 20px 0;
+        }
+
         /* CONTATO */
 
         .empresa-contato {
-            margin-top: 25px;
+            margin-top: 30px;
         }
 
         .empresa-contato h2 {
@@ -246,6 +454,16 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .avaliacao-resumo {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .avaliacao-topo {
+                align-items: flex-start;
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -258,17 +476,17 @@
             IMPULSO MKT
         </div>
 
-        <button class="botao-voltar" onclick="voltarParaInicio()">
+        <button
+            class="botao-voltar"
+            onclick="voltarParaInicio()"
+        >
             ← Voltar
         </button>
 
     </header>
 
-
     <main id="conteudoEmpresa">
-
         <!-- O JavaScript preencherá esta área -->
-
     </main>
 
 
@@ -305,9 +523,7 @@
                 );
 
                 return [];
-
             }
-
         }
 
 
@@ -317,12 +533,531 @@
 
         function escaparHTML(texto) {
 
-            const div = document.createElement("div");
+            const div =
+                document.createElement("div");
 
             div.textContent = texto ?? "";
 
             return div.innerHTML;
+        }
 
+
+        /* ==========================================
+           AVALIAÇÕES
+        ========================================== */
+
+        function lerAvaliacoes() {
+
+            try {
+
+                return JSON.parse(
+                    localStorage.getItem("impulsoAvaliacoes")
+                ) || [];
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao carregar avaliações:",
+                    erro
+                );
+
+                return [];
+            }
+        }
+
+
+        function salvarAvaliacoes(avaliacoes) {
+
+            localStorage.setItem(
+                "impulsoAvaliacoes",
+                JSON.stringify(avaliacoes)
+            );
+        }
+
+
+        /* ==========================================
+           PEGAR AVALIAÇÕES DESTA PUBLICAÇÃO
+        ========================================== */
+
+        function avaliacoesDaPublicacao() {
+
+            const todas = lerAvaliacoes();
+
+            return todas.filter(avaliacao => {
+
+                const postId =
+                    avaliacao.postId ??
+                    avaliacao.idPost ??
+                    avaliacao.publicacaoId;
+
+                return String(postId) === String(idPost);
+            });
+        }
+
+
+        /* ==========================================
+           NOTA DA AVALIAÇÃO
+        ========================================== */
+
+        function pegarNota(avaliacao) {
+
+            return Number(
+                avaliacao.nota ??
+                avaliacao.avaliacao ??
+                avaliacao.estrelas ??
+                0
+            );
+        }
+
+
+        /* ==========================================
+           ESTRELAS VISUAIS
+        ========================================== */
+
+        function estrelasHTML(nota) {
+
+            const notaNumerica =
+                Math.max(
+                    0,
+                    Math.min(5, Number(nota) || 0)
+                );
+
+            const porcentagem =
+                (notaNumerica / 5) * 100;
+
+            return `
+                <span
+                    class="estrelas"
+                    aria-label="${notaNumerica.toFixed(1)} de 5 estrelas"
+                >
+                    <span class="estrelas-base">
+                        ★★★★★
+                    </span>
+
+                    <span
+                        class="estrelas-preenchidas"
+                        style="width:${porcentagem}%"
+                    >
+                        ★★★★★
+                    </span>
+                </span>
+            `;
+        }
+
+
+        /* ==========================================
+           CALCULAR MÉDIA
+        ========================================== */
+
+        function calcularMedia(avaliacoes) {
+
+            if (!avaliacoes.length) {
+                return 0;
+            }
+
+            const soma =
+                avaliacoes.reduce(
+                    (total, avaliacao) =>
+                        total + pegarNota(avaliacao),
+                    0
+                );
+
+            return soma / avaliacoes.length;
+        }
+
+
+        /* ==========================================
+           MOSTRAR AVALIAÇÕES
+        ========================================== */
+
+        function montarAvaliacoesHTML() {
+
+            const avaliacoes =
+                avaliacoesDaPublicacao();
+
+            const media =
+                calcularMedia(avaliacoes);
+
+            const mediaFormatada =
+                media
+                    ? media.toFixed(1).replace(".", ",")
+                    : "0,0";
+
+            let listaHTML = "";
+
+            if (!avaliacoes.length) {
+
+                listaHTML = `
+                    <p class="sem-avaliacoes">
+                        Ainda não existem avaliações para esta publicação.
+                    </p>
+                `;
+
+            } else {
+
+                listaHTML =
+                    avaliacoes
+                        .slice()
+                        .reverse()
+                        .map(avaliacao => {
+
+                            const nota =
+                                pegarNota(avaliacao);
+
+                            const nome =
+                                avaliacao.nome ??
+                                avaliacao.autor ??
+                                "Visitante";
+
+                            const comentario =
+                                avaliacao.comentario ??
+                                avaliacao.texto ??
+                                avaliacao.mensagem ??
+                                "";
+
+                            let dataHTML = "";
+
+                            if (avaliacao.criadoEm) {
+
+                                const data =
+                                    new Date(
+                                        avaliacao.criadoEm
+                                    );
+
+                                if (!isNaN(data.getTime())) {
+
+                                    dataHTML =
+                                        data.toLocaleDateString(
+                                            "pt-BR"
+                                        );
+                                }
+                            }
+
+                            return `
+                                <div class="avaliacao-item">
+
+                                    <div class="avaliacao-topo">
+
+                                        <div>
+                                            <div class="avaliacao-nome">
+                                                ${escaparHTML(nome)}
+                                            </div>
+
+                                            ${estrelasHTML(nota)}
+                                        </div>
+
+                                        ${
+                                            dataHTML
+                                                ? `
+                                                    <span class="avaliacao-data">
+                                                        ${dataHTML}
+                                                    </span>
+                                                  `
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                    ${
+                                        comentario
+                                            ? `
+                                                <p class="avaliacao-comentario">
+                                                    ${escaparHTML(comentario)}
+                                                </p>
+                                              `
+                                            : ""
+                                    }
+
+                                </div>
+                            `;
+                        })
+                        .join("");
+            }
+
+            return `
+                <section class="empresa-avaliacoes">
+
+                    <h2>
+                        ⭐ Avaliações
+                    </h2>
+
+                    <div class="avaliacao-resumo">
+
+                        <div class="avaliacao-media">
+                            ${mediaFormatada}
+                        </div>
+
+                        <div class="avaliacao-info">
+
+                            ${estrelasHTML(media)}
+
+                            <span>
+                                ${
+                                    avaliacoes.length
+                                }
+                                ${
+                                    avaliacoes.length === 1
+                                        ? "avaliação"
+                                        : "avaliações"
+                                }
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-avaliacao">
+
+                        <h3>
+                            Deixe sua avaliação
+                        </h3>
+
+                        <div class="campo-avaliacao">
+
+                            <label for="nomeAvaliacao">
+                                Seu nome
+                            </label>
+
+                            <input
+                                type="text"
+                                id="nomeAvaliacao"
+                                maxlength="60"
+                                placeholder="Digite seu nome"
+                            >
+
+                        </div>
+
+
+                        <div class="campo-avaliacao">
+
+                            <label for="notaAvaliacao">
+                                Sua nota
+                            </label>
+
+                            <div class="nota-selecao">
+
+                                <div class="nota-visual">
+
+                                    <span id="estrelasSelecionadas">
+                                        ${estrelasHTML(5)}
+                                    </span>
+
+                                    <span id="valorNota">
+                                        5,0
+                                    </span>
+
+                                </div>
+
+                                <input
+                                    type="range"
+                                    id="notaAvaliacao"
+                                    min="0.5"
+                                    max="5"
+                                    step="0.5"
+                                    value="5"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="campo-avaliacao">
+
+                            <label for="comentarioAvaliacao">
+                                Comentário
+                            </label>
+
+                            <textarea
+                                id="comentarioAvaliacao"
+                                maxlength="500"
+                                placeholder="Conte o que achou..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            class="botao-avaliar"
+                            id="botaoEnviarAvaliacao"
+                        >
+                            Enviar avaliação
+                        </button>
+
+                    </div>
+
+
+                    <div class="lista-avaliacoes">
+                        ${listaHTML}
+                    </div>
+
+                </section>
+            `;
+        }
+
+
+        /* ==========================================
+           CONFIGURAR NOTA
+        ========================================== */
+
+        function configurarNota() {
+
+            const campo =
+                document.getElementById(
+                    "notaAvaliacao"
+                );
+
+            const estrelas =
+                document.getElementById(
+                    "estrelasSelecionadas"
+                );
+
+            const valor =
+                document.getElementById(
+                    "valorNota"
+                );
+
+            if (!campo || !estrelas || !valor) {
+                return;
+            }
+
+            function atualizar() {
+
+                const nota =
+                    Number(campo.value);
+
+                estrelas.innerHTML =
+                    estrelasHTML(nota);
+
+                valor.textContent =
+                    nota
+                        .toFixed(1)
+                        .replace(".", ",");
+            }
+
+            campo.addEventListener(
+                "input",
+                atualizar
+            );
+
+            atualizar();
+        }
+
+
+        /* ==========================================
+           ENVIAR AVALIAÇÃO
+        ========================================== */
+
+        function configurarEnvioAvaliacao() {
+
+            const botao =
+                document.getElementById(
+                    "botaoEnviarAvaliacao"
+                );
+
+            if (!botao) {
+                return;
+            }
+
+            botao.addEventListener(
+                "click",
+                function () {
+
+                    const nomeInput =
+                        document.getElementById(
+                            "nomeAvaliacao"
+                        );
+
+                    const notaInput =
+                        document.getElementById(
+                            "notaAvaliacao"
+                        );
+
+                    const comentarioInput =
+                        document.getElementById(
+                            "comentarioAvaliacao"
+                        );
+
+                    const nome =
+                        nomeInput.value.trim();
+
+                    const nota =
+                        Number(notaInput.value);
+
+                    const comentario =
+                        comentarioInput.value.trim();
+
+                    if (!nome) {
+
+                        alert(
+                            "Digite seu nome."
+                        );
+
+                        nomeInput.focus();
+
+                        return;
+                    }
+
+                    if (
+                        !nota ||
+                        nota < 0.5 ||
+                        nota > 5
+                    ) {
+
+                        alert(
+                            "Escolha uma nota entre 0,5 e 5 estrelas."
+                        );
+
+                        return;
+                    }
+
+
+                    const avaliacoes =
+                        lerAvaliacoes();
+
+
+                    const novaAvaliacao = {
+
+                        id:
+                            "avaliacao_" +
+                            Date.now(),
+
+                        postId:
+                            idPost,
+
+                        nome:
+                            nome,
+
+                        nota:
+                            nota,
+
+                        comentario:
+                            comentario,
+
+                        criadoEm:
+                            new Date().toISOString()
+                    };
+
+
+                    avaliacoes.push(
+                        novaAvaliacao
+                    );
+
+
+                    salvarAvaliacoes(
+                        avaliacoes
+                    );
+
+
+                    alert(
+                        "Avaliação enviada com sucesso!"
+                    );
+
+
+                    carregarEmpresa();
+                }
+            );
         }
 
 
@@ -332,14 +1067,20 @@
 
         function carregarEmpresa() {
 
-            const posts = lerPosts();
+            const posts =
+                lerPosts();
 
-            const post = posts.find(
-                item => String(item.id) === String(idPost)
-            );
+            const post =
+                posts.find(
+                    item =>
+                        String(item.id) ===
+                        String(idPost)
+                );
 
             const conteudo =
-                document.getElementById("conteudoEmpresa");
+                document.getElementById(
+                    "conteudoEmpresa"
+                );
 
 
             /* PUBLICAÇÃO NÃO ENCONTRADA */
@@ -359,7 +1100,9 @@
                             ou o endereço pode estar incorreto.
                         </p>
 
-                        <button onclick="voltarParaInicio()">
+                        <button
+                            onclick="voltarParaInicio()"
+                        >
                             Voltar para o início
                         </button>
 
@@ -368,7 +1111,6 @@
                 `;
 
                 return;
-
             }
 
 
@@ -377,26 +1119,32 @@
             ========================================== */
 
             const titulo =
-                post.titulo || "Empresa sem nome";
+                post.titulo ||
+                "Empresa sem nome";
 
             const categoria =
-                post.categoria || "Serviço";
+                post.categoria ||
+                "Serviço";
 
             const descricao =
                 post.descricao ||
                 "Esta empresa ainda não adicionou uma descrição.";
 
             const contato =
-                post.contato || "";
+                post.contato ||
+                "";
 
             const imagem =
-                post.imagem || "";
+                post.imagem ||
+                "";
 
             const plano =
-                post.plano || "Básico";
+                post.plano ||
+                "Básico";
 
             const visualizacoes =
-                Number(post.visualizacoes) || 0;
+                Number(post.visualizacoes) ||
+                0;
 
 
             /* ==========================================
@@ -408,12 +1156,18 @@
             if (contato) {
 
                 let numero =
-                    contato.replace(/\D/g, "");
+                    contato.replace(
+                        /\D/g,
+                        ""
+                    );
 
                 if (numero.length >= 10) {
 
-                    if (!numero.startsWith("55")) {
-                        numero = "55" + numero;
+                    if (
+                        !numero.startsWith("55")
+                    ) {
+                        numero =
+                            "55" + numero;
                     }
 
                     const mensagem =
@@ -427,14 +1181,13 @@
                             class="botao-whatsapp"
                             href="https://wa.me/${numero}?text=${mensagem}"
                             target="_blank"
+                            rel="noopener noreferrer"
                         >
                             💬 Falar no WhatsApp
                         </a>
 
                     `;
-
                 }
-
             }
 
 
@@ -464,8 +1217,23 @@
                     </span>
 
                 `;
-
             }
+
+
+            /* ==========================================
+               AVALIAÇÕES
+            ========================================== */
+
+            const avaliacoes =
+                avaliacoesDaPublicacao();
+
+            const media =
+                calcularMedia(avaliacoes);
+
+            const mediaFormatada =
+                media
+                    ? media.toFixed(1).replace(".", ",")
+                    : "0,0";
 
 
             /* ==========================================
@@ -477,32 +1245,24 @@
                 <div class="empresa-container">
 
                     <div class="empresa-imagem">
-
                         ${imagemHTML}
-
                     </div>
 
 
                     <div class="empresa-conteudo">
 
                         <span class="empresa-categoria">
-
                             ${escaparHTML(categoria)}
-
                         </span>
 
 
                         <h1 class="empresa-titulo">
-
                             ${escaparHTML(titulo)}
-
                         </h1>
 
 
                         <p class="empresa-descricao">
-
                             ${escaparHTML(descricao)}
-
                         </p>
 
 
@@ -514,10 +1274,20 @@
                             </span>
 
                             <span>
-                                ⭐ Avaliações
+                                ⭐ ${mediaFormatada}
+                                ${
+                                    avaliacoes.length
+                                } ${
+                                    avaliacoes.length === 1
+                                        ? "avaliação"
+                                        : "avaliações"
+                                }
                             </span>
 
                         </div>
+
+
+                        ${montarAvaliacoesHTML()}
 
 
                         <div class="empresa-contato">
@@ -528,9 +1298,10 @@
 
                             <p class="contato-texto">
 
-                                ${contato
-                                    ? "Entre em contato diretamente com esta empresa:"
-                                    : "Esta empresa não informou um contato."
+                                ${
+                                    contato
+                                        ? "Entre em contato diretamente com esta empresa:"
+                                        : "Esta empresa não informou um contato."
                                 }
 
                             </p>
@@ -543,6 +1314,7 @@
                         <div class="empresa-plano">
 
                             Plano da publicação:
+
                             <strong>
                                 ${escaparHTML(plano)}
                             </strong>
@@ -557,12 +1329,20 @@
 
 
             /* ==========================================
+               CONFIGURAR AVALIAÇÕES
+            ========================================== */
+
+            configurarNota();
+
+            configurarEnvioAvaliacao();
+
+
+            /* ==========================================
                ATUALIZAR TÍTULO DA GUIA
             ========================================== */
 
             document.title =
                 `${titulo} | Impulso MKT`;
-
         }
 
 
@@ -572,8 +1352,15 @@
 
         function voltarParaInicio() {
 
-            window.close();
+            if (window.history.length > 1) {
 
+                window.history.back();
+
+            } else {
+
+                window.location.href =
+                    "index.html";
+            }
         }
 
 

@@ -2450,3 +2450,174 @@ footer p {
         padding: 13px;
     }
 }
+
+
+/* =====================================================
+   AVALIAÇÕES
+===================================================== */
+
+.empresa-avaliacoes {
+    margin-top: 35px;
+    padding-top: 30px;
+    border-top: 1px solid #29202f;
+}
+
+.empresa-avaliacoes h2 {
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+
+.avaliacao-resumo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background: #18131f;
+    border: 1px solid #30203e;
+    border-radius: 12px;
+}
+
+.avaliacao-media {
+    font-size: 38px;
+    font-weight: bold;
+    color: #b875ff;
+}
+
+.avaliacao-estrelas {
+    color: #ffd54a;
+    font-size: 25px;
+    letter-spacing: 2px;
+}
+
+.avaliacao-total {
+    color: #aaa;
+    margin-top: 5px;
+}
+
+.form-avaliacao {
+    padding: 20px;
+    margin-bottom: 25px;
+    background: #151219;
+    border: 1px solid #29202f;
+    border-radius: 12px;
+}
+
+.form-avaliacao h3 {
+    margin-bottom: 15px;
+}
+
+.estrelas-escolha {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 15px;
+}
+
+.estrela {
+    border: none;
+    background: transparent;
+    color: #555;
+    font-size: 30px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.estrela.selecionada {
+    color: #ffd54a;
+}
+
+.nota-selecionada {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.form-avaliacao textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    resize: vertical;
+
+    background: #0b0b0f;
+    color: white;
+
+    border: 1px solid #30203e;
+    border-radius: 8px;
+
+    outline: none;
+}
+
+.form-avaliacao textarea:focus {
+    border-color: #9b4dff;
+}
+
+.botao-enviar-avaliacao {
+    margin-top: 12px;
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #9b4dff;
+    color: white;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.botao-enviar-avaliacao:hover {
+    background: #8339df;
+}
+
+.erro-avaliacao {
+    color: #ff7070;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.lista-avaliacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.avaliacao {
+    padding: 18px;
+
+    background: #151219;
+    border: 1px solid #29202f;
+    border-radius: 10px;
+}
+
+.avaliacao-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.avaliacao-nome {
+    font-weight: bold;
+}
+
+.avaliacao-nota {
+    color: #ffd54a;
+    font-size: 18px;
+}
+
+.avaliacao-comentario {
+    color: #c8c8c8;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.sem-avaliacoes {
+    padding: 25px;
+    text-align: center;
+
+    color: #888;
+
+    background: #151219;
+    border-radius: 10px;
+}
