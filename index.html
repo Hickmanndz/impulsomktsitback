@@ -796,76 +796,503 @@
     </div>
 
 <!-- ================= MINHA CONTA ================= -->
+<!-- =====================================================
+     MINHA CONTA
+===================================================== -->
 
-<div class="modal" id="modalConta">
-    <div class="modal-caixa conta-caixa">
+<div class="modal modal-conta" id="modalConta">
 
-        <button type="button" class="fechar" id="fecharConta">×</button>
+    <!-- MODAL DE RECORTE DA FOTO -->
 
-        <div class="conta-cabecalho">
-            <div class="avatar-conta" id="avatarConta">U</div>
+<div class="modal" id="modalRecorteFoto">
 
-            <h2 id="nomeConta">Minha conta</h2>
-            <p id="emailConta">usuario@email.com</p>
+    <div class="modal-caixa recorte-caixa">
 
-            <label for="fotoPerfil" class="botao-foto">
-                Alterar foto
-            </label>
+        <button
+            type="button"
+            class="fechar"
+            id="fecharRecorteFoto"
+        >
+            ×
+        </button>
 
-            <input type="file" id="fotoPerfil"
-                   accept="image/png,image/jpeg,image/webp" hidden>
+        <div class="recorte-cabecalho">
+            <h2>Ajustar foto de perfil</h2>
+            <p>
+                Arraste a imagem e escolha a parte que deseja mostrar.
+            </p>
         </div>
 
-        <div class="plano-atual">
-            <span>Meu plano</span>
-            <strong id="nomePlanoAtual">Sem plano</strong>
+
+        <div class="area-recorte">
+
+            <div
+                class="recorte-viewport"
+                id="recorteViewport"
+            >
+
+                <img
+                    id="imagemRecorte"
+                    src=""
+                    alt="Prévia da foto de perfil"
+                >
+
+            </div>
+
         </div>
 
-        <div class="perfil-informacoes">
-            <h3>Meu perfil profissional</h3>
 
-            <p><strong>Nome:</strong> <span id="contaNomeProfissional">Não informado</span></p>
-            <p><strong>Categoria:</strong> <span id="contaCategoria">Não informada</span></p>
-            <p><strong>Descrição:</strong> <span id="contaDescricao">Adicione uma descrição.</span></p>
+        <div class="controle-zoom">
 
-            <button type="button" class="botao-secundario"
-                    id="botaoEditarPerfil">
-                Editar informações
+            <span>−</span>
+
+            <input
+                type="range"
+                id="zoomFoto"
+                min="1"
+                max="3"
+                step="0.01"
+                value="1"
+            >
+
+            <span>+</span>
+
+        </div>
+
+
+        <div class="recorte-acoes">
+
+            <button
+                type="button"
+                class="botao-secundario"
+                id="cancelarRecorte"
+            >
+                Cancelar
             </button>
-        </div>
 
-        <div class="recursos-conta">
-            <h3>Recursos do seu plano</h3>
-            <div id="listaRecursos"></div>
-        </div>
+            <button
+                type="button"
+                class="botao-principal"
+                id="salvarRecorte"
+            >
+                Salvar foto
+            </button>
 
-        <div class="conta-opcoes">
-            <button type="button" id="botaoCriarPost">📢 Criar meu post</button>
-            <button type="button" id="botaoMeusPosts">📋 Meus posts</button>
-            <button type="button" id="botaoMudarPlano">⭐ Mudar de plano</button>
-            <button type="button" id="botaoAlterarSenha">🔒 Alterar senha</button>
-            <button type="button" id="botaoSair">🚪 Sair da conta</button>
         </div>
 
     </div>
 
-    
-<section class="painel-plano">
-    <h2>Recursos do seu plano</h2>
+</div>
 
-    <p id="limite-posts">
-        Carregando limite de publicações...
-    </p>
+    <div class="conta-painel">
 
-    <div class="lista-recursos">
-        <p data-recurso="editar">✏️ Editar publicações</p>
-        <p data-recurso="excluir">🗑️ Excluir publicações</p>
-        <p data-recurso="destaqueVisual">⭐ Destaque visual</p>
-        <p data-recurso="prioridadeBusca">🚀 Prioridade nas buscas</p>
-        <p data-recurso="estatisticas">📊 Estatísticas</p>
-        <p data-recurso="seloPremium">👑 Selo Premium</p>
+        <!-- CABEÇALHO -->
+        <div class="conta-cabecalho-principal">
+
+            <div>
+                <span class="conta-marca">IMPULSO MKT</span>
+
+                <h1>Minha conta</h1>
+
+                <p>
+                    Gerencie seu perfil, publicações e plano.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="conta-fechar"
+                id="fecharConta"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- CONTEÚDO -->
+        <div class="conta-conteudo">
+
+
+            <!-- =================================================
+                 PERFIL
+            ================================================== -->
+
+            <section class="conta-grid-topo">
+
+                <div class="card-conta perfil-card">
+
+                    <div class="perfil-topo">
+
+                        <div
+                            class="avatar-conta"
+                            id="avatarConta"
+                        >
+                            U
+                        </div>
+
+                        <div class="perfil-nome">
+
+                            <h2 id="nomeConta">
+                                Minha conta
+                            </h2>
+
+                            <p id="emailConta">
+                                usuario@email.com
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <label
+                        for="fotoPerfil"
+                        class="botao-foto"
+                    >
+                        Alterar foto
+                    </label>
+
+                    <input
+                        type="file"
+                        id="fotoPerfil"
+                        accept="image/png,image/jpeg,image/webp"
+                        hidden
+                    >
+
+                </div>
+
+
+                <!-- PLANO -->
+
+                <div class="card-conta plano-card">
+
+                    <div class="card-titulo">
+
+                        <span>MEU PLANO</span>
+
+                        <span class="icone-plano">
+                            ⭐
+                        </span>
+
+                    </div>
+
+                    <strong id="nomePlanoAtual">
+                        Sem plano
+                    </strong>
+
+                    <p>
+                        Plano atual da sua conta.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 PERFIL PROFISSIONAL
+            ================================================== -->
+
+            <section class="card-conta perfil-informacoes">
+
+                <div class="secao-titulo">
+
+                    <div>
+                        <span>PERFIL</span>
+
+                        <h3>
+                            Meu perfil profissional
+                        </h3>
+                    </div>
+
+                    <div class="icone-secao">
+                        👤
+                    </div>
+
+                </div>
+
+
+                <div class="informacoes-grid">
+
+                    <div class="informacao-item">
+
+                        <small>Nome</small>
+
+                        <strong id="contaNomeProfissional">
+                            Não informado
+                        </strong>
+
+                    </div>
+
+
+                    <div class="informacao-item">
+
+                        <small>Categoria</small>
+
+                        <strong id="contaCategoria">
+                            Não informada
+                        </strong>
+
+                    </div>
+
+
+                    <div class="informacao-item informacao-descricao">
+
+                        <small>Descrição</small>
+
+                        <strong id="contaDescricao">
+                            Adicione uma descrição.
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="botao-secundario"
+                    id="botaoEditarPerfil"
+                >
+                    ✏️ Editar informações
+                </button>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 RECURSOS DO PLANO
+            ================================================== -->
+
+            <section class="card-conta painel-plano">
+
+                <div class="secao-titulo">
+
+                    <div>
+                        <span>SEU PLANO</span>
+
+                        <h3>
+                            Recursos disponíveis
+                        </h3>
+                    </div>
+
+                    <div class="icone-secao">
+                        🚀
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="limite-posts"
+                    class="limite-posts"
+                >
+                    Carregando limite de publicações...
+                </p>
+
+
+                <div
+                    class="lista-recursos"
+                    id="listaRecursos"
+                >
+
+                    <div
+                        class="recurso"
+                        data-recurso="editar"
+                    >
+                        <span>✏️</span>
+                        <div>
+                            <strong>Editar publicações</strong>
+                            <small>Edite seus posts publicados.</small>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="recurso"
+                        data-recurso="excluir"
+                    >
+                        <span>🗑️</span>
+                        <div>
+                            <strong>Excluir publicações</strong>
+                            <small>Gerencie seus posts.</small>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="recurso"
+                        data-recurso="destaqueVisual"
+                    >
+                        <span>⭐</span>
+                        <div>
+                            <strong>Destaque visual</strong>
+                            <small>Deixe sua publicação mais visível.</small>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="recurso"
+                        data-recurso="prioridadeBusca"
+                    >
+                        <span>🚀</span>
+                        <div>
+                            <strong>Prioridade nas buscas</strong>
+                            <small>Mais destaque nas pesquisas.</small>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="recurso"
+                        data-recurso="estatisticas"
+                    >
+                        <span>📊</span>
+                        <div>
+                            <strong>Estatísticas</strong>
+                            <small>Acompanhe o desempenho.</small>
+                        </div>
+                    </div>
+
+
+                    <div
+                        class="recurso"
+                        data-recurso="seloPremium"
+                    >
+                        <span>👑</span>
+                        <div>
+                            <strong>Selo Premium</strong>
+                            <small>Destaque especial para sua conta.</small>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 GERENCIAMENTO DA CONTA
+            ================================================== -->
+
+            <section class="conta-gerenciamento">
+
+                <div class="secao-titulo gerenciamento-titulo">
+
+                    <div>
+                        <span>GERENCIAMENTO</span>
+
+                        <h3>
+                            O que você deseja fazer?
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div class="conta-opcoes">
+
+                    <button
+                        type="button"
+                        id="botaoCriarPost"
+                        class="opcao-conta"
+                    >
+                        <span class="opcao-icone">📢</span>
+
+                        <span>
+                            <strong>Criar meu post</strong>
+                            <small>
+                                Divulgue seu trabalho no Impulso MKT.
+                            </small>
+                        </span>
+
+                        <b>›</b>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="botaoMeusPosts"
+                        class="opcao-conta"
+                    >
+                        <span class="opcao-icone">📋</span>
+
+                        <span>
+                            <strong>Meus posts</strong>
+                            <small>
+                                Veja e gerencie suas publicações.
+                            </small>
+                        </span>
+
+                        <b>›</b>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="botaoMudarPlano"
+                        class="opcao-conta"
+                    >
+                        <span class="opcao-icone">⭐</span>
+
+                        <span>
+                            <strong>Mudar de plano</strong>
+                            <small>
+                                Escolha um plano com mais recursos.
+                            </small>
+                        </span>
+
+                        <b>›</b>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="botaoAlterarSenha"
+                        class="opcao-conta"
+                    >
+                        <span class="opcao-icone">🔒</span>
+
+                        <span>
+                            <strong>Alterar senha</strong>
+                            <small>
+                                Atualize a senha da sua conta.
+                            </small>
+                        </span>
+
+                        <b>›</b>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 SAIR
+            ================================================== -->
+
+            <div class="conta-sair">
+
+                <button
+                    type="button"
+                    id="botaoSair"
+                >
+                    🚪 Sair da conta
+                </button>
+
+            </div>
+
+
+        </div>
+
     </div>
-</section>
 
 </div>
 

@@ -2621,3 +2621,911 @@ footer p {
     background: #151219;
     border-radius: 10px;
 }
+
+/* =====================================================
+   MINHA CONTA - PAINEL COMPLETO
+===================================================== */
+
+.modal-conta {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    display: none;
+
+    align-items: stretch;
+    justify-content: stretch;
+
+    background: #070707;
+
+    z-index: 9999;
+
+    overflow-y: auto;
+}
+
+
+/* =====================================================
+   PAINEL
+===================================================== */
+
+.conta-painel {
+    width: 100%;
+    min-height: 100vh;
+
+    color: #fff;
+
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(132, 54, 255, 0.16),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 10% 50%,
+            rgba(132, 54, 255, 0.06),
+            transparent 30%
+        ),
+        #080808;
+}
+
+
+/* =====================================================
+   CABEÇALHO
+===================================================== */
+
+.conta-cabecalho-principal {
+    min-height: 120px;
+
+    padding: 28px 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    background: rgba(10, 10, 10, 0.96);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.conta-marca {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #9b5cff;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+.conta-cabecalho-principal h1 {
+    margin: 0;
+
+    font-size: 30px;
+}
+
+.conta-cabecalho-principal p {
+    margin: 6px 0 0;
+
+    color: #999;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   BOTÃO FECHAR
+===================================================== */
+
+.conta-fechar {
+    width: 46px;
+    height: 46px;
+
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+
+    background: #151515;
+
+    color: white;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.conta-fechar:hover {
+    background: #8b45ff;
+
+    border-color: #8b45ff;
+
+    transform: scale(1.05);
+}
+
+
+/* =====================================================
+   CONTEÚDO
+===================================================== */
+
+.conta-conteudo {
+    width: min(1200px, calc(100% - 80px));
+
+    margin: auto;
+
+    padding: 40px 0 70px;
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.card-conta {
+    box-sizing: border-box;
+
+    padding: 25px;
+
+    background: rgba(20, 20, 20, 0.88);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.25);
+
+    transition: 0.2s;
+}
+
+.card-conta:hover {
+    border-color: rgba(139, 69, 255, 0.35);
+}
+
+
+/* =====================================================
+   PERFIL + PLANO
+===================================================== */
+
+.conta-grid-topo {
+    display: grid;
+
+    grid-template-columns: 1.5fr 1fr;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+
+/* Perfil */
+
+.perfil-topo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+.avatar-conta {
+    width: 78px;
+    height: 78px;
+
+    min-width: 78px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8b45ff,
+            #4b1e91
+        );
+
+    color: white;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.avatar-conta img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.perfil-nome h2 {
+    margin: 0;
+
+    font-size: 22px;
+}
+
+.perfil-nome p {
+    margin: 5px 0 0;
+
+    color: #999;
+
+    font-size: 14px;
+}
+
+.botao-foto {
+    display: inline-block;
+
+    margin-top: 20px;
+
+    padding: 10px 15px;
+
+    border-radius: 9px;
+
+    background: #171717;
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    color: #ddd;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.botao-foto:hover {
+    background: #8b45ff;
+
+    color: white;
+
+    border-color: #8b45ff;
+}
+
+
+/* =====================================================
+   PLANO
+===================================================== */
+
+.plano-card {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+}
+
+.card-titulo {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+}
+
+.card-titulo span:first-child {
+    color: #999;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+.icone-plano {
+    font-size: 20px;
+}
+
+.plano-card strong {
+    color: #b77cff;
+
+    font-size: 26px;
+}
+
+.plano-card p {
+    margin: 5px 0 0;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   TÍTULOS DAS SEÇÕES
+===================================================== */
+
+.secao-titulo {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 22px;
+}
+
+.secao-titulo span {
+    color: #9b5cff;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+.secao-titulo h3 {
+    margin: 4px 0 0;
+
+    font-size: 20px;
+}
+
+.icone-secao {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(139,69,255,0.12);
+
+    font-size: 19px;
+}
+
+
+/* =====================================================
+   PERFIL PROFISSIONAL
+===================================================== */
+
+.perfil-informacoes {
+    margin-bottom: 20px;
+}
+
+.informacoes-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr 2fr;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.informacao-item {
+    min-height: 75px;
+
+    padding: 15px;
+
+    box-sizing: border-box;
+
+    border-radius: 12px;
+
+    background: #111;
+
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.informacao-item small {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #777;
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+}
+
+.informacao-item strong {
+    color: #ddd;
+
+    font-size: 14px;
+
+    font-weight: 500;
+}
+
+.informacao-descricao strong {
+    line-height: 1.5;
+}
+
+.botao-secundario {
+    padding: 11px 16px;
+
+    border: 1px solid rgba(139,69,255,0.4);
+
+    border-radius: 9px;
+
+    background: rgba(139,69,255,0.08);
+
+    color: #c8a9ff;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.botao-secundario:hover {
+    background: #8b45ff;
+
+    color: white;
+}
+
+
+/* =====================================================
+   RECURSOS
+===================================================== */
+
+.painel-plano {
+    margin-bottom: 35px;
+}
+
+.limite-posts {
+    margin: 0 0 18px;
+
+    padding: 12px 15px;
+
+    border-radius: 10px;
+
+    background: rgba(139,69,255,0.08);
+
+    border: 1px solid rgba(139,69,255,0.15);
+
+    color: #c8a9ff;
+
+    font-size: 13px;
+}
+
+.lista-recursos {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+}
+
+.recurso {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background: #111;
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+    transition: 0.2s;
+}
+
+.recurso:hover {
+    border-color: rgba(139,69,255,0.35);
+
+    transform: translateY(-2px);
+}
+
+.recurso > span {
+    font-size: 20px;
+}
+
+.recurso strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #ddd;
+
+    font-size: 13px;
+}
+
+.recurso small {
+    color: #777;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   GERENCIAMENTO
+===================================================== */
+
+.conta-gerenciamento {
+    margin-top: 20px;
+}
+
+.gerenciamento-titulo {
+    margin-bottom: 15px;
+}
+
+.conta-opcoes {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+.opcao-conta {
+    min-height: 75px;
+
+    padding: 15px 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    text-align: left;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 13px;
+
+    background: #111;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.opcao-conta:hover {
+    background: #171717;
+
+    border-color: rgba(139,69,255,0.45);
+
+    transform: translateY(-2px);
+}
+
+.opcao-icone {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: rgba(139,69,255,0.12);
+
+    font-size: 18px;
+}
+
+.opcao-conta > span:nth-child(2) {
+    flex: 1;
+}
+
+.opcao-conta strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 14px;
+}
+
+.opcao-conta small {
+    color: #777;
+
+    font-size: 11px;
+}
+
+.opcao-conta b {
+    color: #777;
+
+    font-size: 24px;
+
+    font-weight: 400;
+}
+
+
+/* =====================================================
+   SAIR
+===================================================== */
+
+.conta-sair {
+    margin-top: 30px;
+
+    padding-top: 25px;
+
+    border-top: 1px solid rgba(255,255,255,0.07);
+
+    text-align: right;
+}
+
+.conta-sair button {
+    padding: 11px 18px;
+
+    border: 1px solid rgba(255,70,70,0.2);
+
+    border-radius: 9px;
+
+    background: rgba(255,70,70,0.06);
+
+    color: #ff7777;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.conta-sair button:hover {
+    background: #b52b2b;
+
+    color: white;
+
+    border-color: #b52b2b;
+}
+
+
+/* =====================================================
+   RESPONSIVO
+===================================================== */
+
+@media (max-width: 850px) {
+
+    .conta-conteudo {
+        width: calc(100% - 35px);
+    }
+
+    .conta-cabecalho-principal {
+        padding: 22px;
+    }
+
+    .conta-grid-topo {
+        grid-template-columns: 1fr;
+    }
+
+    .informacoes-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .informacao-descricao {
+        grid-column: 1 / -1;
+    }
+
+    .lista-recursos {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .conta-cabecalho-principal h1 {
+        font-size: 24px;
+    }
+
+    .conta-cabecalho-principal p {
+        font-size: 12px;
+    }
+
+    .conta-conteudo {
+        width: calc(100% - 25px);
+
+        padding-top: 25px;
+    }
+
+    .informacoes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .informacao-descricao {
+        grid-column: auto;
+    }
+
+    .lista-recursos {
+        grid-template-columns: 1fr;
+    }
+
+    .conta-opcoes {
+        grid-template-columns: 1fr;
+    }
+
+    .conta-sair {
+        text-align: center;
+    }
+
+    .conta-sair button {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   RECORTE DA FOTO DE PERFIL
+===================================================== */
+
+.recorte-caixa {
+    width: min(500px, calc(100% - 30px));
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    background: #111;
+
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+
+    color: white;
+}
+
+.recorte-cabecalho {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.recorte-cabecalho h2 {
+    margin: 0 0 8px;
+}
+
+.recorte-cabecalho p {
+    margin: 0;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+/* Área onde a imagem será movimentada */
+
+.area-recorte {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px;
+}
+
+
+/* Círculo de visualização */
+
+.recorte-viewport {
+    position: relative;
+
+    width: 280px;
+    height: 280px;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    background: #050505;
+
+    border: 3px solid #8b45ff;
+
+    box-shadow:
+        0 0 30px rgba(139,69,255,0.25);
+
+    cursor: grab;
+
+    touch-action: none;
+}
+
+.recorte-viewport:active {
+    cursor: grabbing;
+}
+
+
+/* Imagem */
+
+#imagemRecorte {
+    position: absolute;
+
+    max-width: none;
+
+    width: auto;
+    height: auto;
+
+    user-select: none;
+    pointer-events: none;
+
+    transform-origin: center center;
+}
+
+
+/* Zoom */
+
+.controle-zoom {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 25px 0;
+}
+
+.controle-zoom span {
+    color: #aaa;
+
+    font-size: 20px;
+}
+
+#zoomFoto {
+    flex: 1;
+
+    accent-color: #8b45ff;
+
+    cursor: pointer;
+}
+
+
+/* Botões */
+
+.recorte-acoes {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+.botao-principal {
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #8b45ff;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.botao-principal:hover {
+    background: #7333df;
+    transform: translateY(-1px);
+}
+
+
+@media (max-width: 500px) {
+
+    .recorte-caixa {
+        padding: 22px;
+    }
+
+    .recorte-viewport {
+        width: 240px;
+        height: 240px;
+    }
+
+    .recorte-acoes {
+        flex-direction: column;
+    }
+
+    .recorte-acoes button {
+        width: 100%;
+    }
+}
+

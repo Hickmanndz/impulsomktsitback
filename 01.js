@@ -3563,3 +3563,482 @@ function verificarConteudoInadequado(formulario) {
 
     return false;
 }
+
+
+/* =====================================================
+   RECORTE DA FOTO DE PERFIL
+===================================================== */
+
+(function () {
+
+    const fotoPerfil = document.getElementById("fotoPerfil");
+    const modalRecorte = document.getElementById("modalRecorteFoto");
+    const imagemRecorte = document.getElementById("imagemRecorte");
+    const viewport = document.getElementById("recorteViewport");
+    const zoomFoto = document.getElementById("zoomFoto");
+
+    const fecharRecorte =
+        document.getElementById("fecharRecorteFoto");
+
+    const cancelarRecorte =
+        document.getElementById("cancelarRecorte");
+
+    const salvarRecorte =
+        document.getElementById("salvarRecorte");
+
+
+    if (
+        !fotoPerfil ||
+        !modalRecorte ||
+        !imagemRecorte ||
+        !viewport ||
+        !zoomFoto
+    ) {
+        return;
+    }
+
+
+    let imagemOriginal = null;
+
+    let posicaoX = 0;
+    let posicaoY = 0;
+
+    let arrastando = false;
+
+    let inicioX = 0;
+    let inicioY = 0;
+
+
+    /* =================================================
+       ESCOLHER FOTO
+    ================================================= */
+
+    fotoPerfil.addEventListener("change", function (event) {
+
+        const arquivo = event.target.files[0];
+
+        if (!arquivo) return;
+
+
+        if (!arquivo.type.startsWith("image/")) {
+
+            alert("Escolha uma imagem válida.");
+
+            return;
+        }
+
+
+        const leitor = new FileReader();
+
+
+        leitor.onload = function (e) {
+
+            imagemOriginal = e.target.result;
+
+            imagemRecorte.src = imagemOriginal;
+
+
+            posicaoX = 0;
+            posicaoY = 0;
+
+            zoomFoto.value = "1";
+
+
+            imagemRecorte.onload = function () {
+
+                ajustarImagemInicial();
+
+                atualizarImagem();
+
+            };
+
+
+            modalRecorte.style.display = "flex";
+
+        };
+
+
+        leitor.readAsDataURL(arquivo);
+
+    });
+
+
+    /* =================================================
+       AJUSTE INICIAL
+    ================================================= */
+
+    function ajustarImagemInicial() {
+
+        const largura =
+            imagemRecorte.naturalWidth;
+
+        const altura =
+            imagemRecorte.naturalHeight;
+
+
+        const tamanhoViewport =
+            viewport.clientWidth;
+
+
+        /*
+         * Faz a menor dimensão da imagem
+         * preencher o círculo.
+         */
+
+        if (largura > altura) {
+
+            imagemRecorte.style.height =
+                tamanhoViewport + "px";
+
+            imagemRecorte.style.width =
+                "auto";
+
+        } else {
+
+            imagemRecorte.style.width =
+                tamanhoViewport + "px";
+
+            imagemRecorte.style.height =
+                "auto";
+        }
+
+
+        centralizarImagem();
+
+    }
+
+
+    function centralizarImagem() {
+
+        const largura =
+            imagemRecorte.getBoundingClientRect().width;
+
+        const altura =
+            imagemRecorte.getBoundingClientRect().height;
+
+
+        posicaoX =
+            (viewport.clientWidth - largura) / 2;
+
+        posicaoY =
+            (viewport.clientHeight - altura) / 2;
+
+    }
+
+
+    /* =================================================
+       ATUALIZAR IMAGEM
+    ================================================= */
+
+    function atualizarImagem() {
+
+        const zoom =
+            Number(zoomFoto.value);
+
+
+        imagemRecorte.style.transform =
+            `translate(${posicaoX}px, ${posicaoY}px) scale(${zoom})`;
+
+    }
+
+
+    /* =================================================
+       ZOOM
+    ================================================= */
+
+    zoomFoto.addEventListener("input", function () {
+
+        atualizarImagem();
+
+    });
+
+
+    /* =================================================
+       ARRASTAR COM MOUSE
+    ================================================= */
+
+    viewport.addEventListener("mousedown", function (event) {
+
+        arrastando = true;
+
+        inicioX = event.clientX - posicaoX;
+        inicioY = event.clientY - posicaoY;
+
+    });
+
+
+    window.addEventListener("mousemove", function (event) {
+
+        if (!arrastando) return;
+
+
+        posicaoX =
+            event.clientX - inicioX;
+
+        posicaoY =
+            event.clientY - inicioY;
+
+
+        atualizarImagem();
+
+    });
+
+
+    window.addEventListener("mouseup", function () {
+
+        arrastando = false;
+
+    });
+
+
+    /* =================================================
+       TOUCH / CELULAR
+    ================================================= */
+
+    viewport.addEventListener(
+        "touchstart",
+        function (event) {
+
+            const toque = event.touches[0];
+
+            arrastando = true;
+
+            inicioX =
+                toque.clientX - posicaoX;
+
+            inicioY =
+                toque.clientY - posicaoY;
+
+        },
+        { passive: true }
+    );
+
+
+    viewport.addEventListener(
+        "touchmove",
+        function (event) {
+
+            if (!arrastando) return;
+
+            const toque = event.touches[0];
+
+            posicaoX =
+                toque.clientX - inicioX;
+
+            posicaoY =
+                toque.clientY - inicioY;
+
+            atualizarImagem();
+
+        },
+        { passive: true }
+    );
+
+
+    viewport.addEventListener(
+        "touchend",
+        function () {
+
+            arrastando = false;
+
+        }
+    );
+
+
+    /* =================================================
+       SALVAR FOTO
+    ================================================= */
+
+    salvarRecorte.addEventListener(
+        "click",
+        function () {
+
+            const tamanho =
+                viewport.clientWidth;
+
+
+            const canvas =
+                document.createElement("canvas");
+
+            canvas.width = tamanho;
+            canvas.height = tamanho;
+
+
+            const contexto =
+                canvas.getContext("2d");
+
+
+            const zoom =
+                Number(zoomFoto.value);
+
+
+            const imagem =
+                imagemRecorte;
+
+
+            const larguraOriginal =
+                imagem.naturalWidth;
+
+            const alturaOriginal =
+                imagem.naturalHeight;
+
+
+            /*
+             * Descobre o tamanho exibido
+             * antes do zoom.
+             */
+
+            const larguraExibida =
+                imagem.getBoundingClientRect().width / zoom;
+
+            const alturaExibida =
+                imagem.getBoundingClientRect().height / zoom;
+
+
+            const escalaX =
+                larguraOriginal / larguraExibida;
+
+            const escalaY =
+                alturaOriginal / alturaExibida;
+
+
+            const xImagem =
+                posicaoX / zoom;
+
+
+            const yImagem =
+                posicaoY / zoom;
+
+
+            contexto.drawImage(
+                imagem,
+                -xImagem * escalaX,
+                -yImagem * escalaY,
+                larguraOriginal,
+                alturaOriginal,
+                0,
+                0,
+                tamanho,
+                tamanho
+            );
+
+
+            const fotoFinal =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    0.90
+                );
+
+
+            salvarFotoPerfil(fotoFinal);
+
+            fecharModalRecorte();
+
+        }
+    );
+
+
+    /* =================================================
+       SALVAR NO PERFIL
+    ================================================= */
+
+    function salvarFotoPerfil(foto) {
+
+        const avatar =
+            document.getElementById("avatarConta");
+
+
+        if (avatar) {
+
+            avatar.innerHTML =
+                `<img src="${foto}" alt="Foto de perfil">`;
+
+        }
+
+
+        /*
+         * Salva temporariamente no usuário logado.
+         */
+
+        const usuario =
+            JSON.parse(
+                localStorage.getItem(
+                    "impulsoUsuarioLogado"
+                )
+            );
+
+
+        if (!usuario) return;
+
+
+        usuario.fotoPerfil = foto;
+
+
+        localStorage.setItem(
+            "impulsoUsuarioLogado",
+            JSON.stringify(usuario)
+        );
+
+
+        /*
+         * Atualiza também o cadastro
+         * do usuário.
+         */
+
+        const usuarios =
+            JSON.parse(
+                localStorage.getItem(
+                    "impulsoUsuarios"
+                )
+            ) || [];
+
+
+        const indice =
+            usuarios.findIndex(
+                item =>
+                    String(item.id) ===
+                    String(usuario.id)
+            );
+
+
+        if (indice !== -1) {
+
+            usuarios[indice].fotoPerfil =
+                foto;
+
+            localStorage.setItem(
+                "impulsoUsuarios",
+                JSON.stringify(usuarios)
+            );
+
+        }
+
+    }
+
+
+    /* =================================================
+       FECHAR
+    ================================================= */
+
+    function fecharModalRecorte() {
+
+        modalRecorte.style.display = "none";
+
+        fotoPerfil.value = "";
+
+    }
+
+
+    fecharRecorte.addEventListener(
+        "click",
+        fecharModalRecorte
+    );
+
+
+    cancelarRecorte.addEventListener(
+        "click",
+        fecharModalRecorte
+    );
+
+
+})();
