@@ -489,7 +489,8 @@
         <!-- O JavaScript preencherá esta área -->
     </main>
 
-
+    <script src="banco-dados.js"></script>
+    <script src="sistema-armazenamento.js"></script>
     <script>
 
         /* ==========================================
@@ -510,6 +511,13 @@
         function lerPosts() {
 
             try {
+                if (window.ImpulsoStorage && window.ImpulsoStorage.getPosts) {
+                    return window.ImpulsoStorage.getPosts();
+                }
+
+                if (window.DB && window.DB.getCollection) {
+                    return window.DB.getCollection("posts");
+                }
 
                 return JSON.parse(
                     localStorage.getItem("impulsoPosts")
@@ -549,6 +557,14 @@
         function lerAvaliacoes() {
 
             try {
+                if (window.ImpulsoStorage && window.ImpulsoStorage.getPagamentos) {
+                    const pagamentos = window.ImpulsoStorage.getPagamentos();
+                    return Array.isArray(pagamentos) ? pagamentos : [];
+                }
+
+                if (window.DB && window.DB.getCollection) {
+                    return window.DB.getCollection("avaliacoes") || [];
+                }
 
                 return JSON.parse(
                     localStorage.getItem("impulsoAvaliacoes")
@@ -567,6 +583,11 @@
 
 
         function salvarAvaliacoes(avaliacoes) {
+
+            if (window.DB && window.DB.setCollection) {
+                window.DB.setCollection("avaliacoes", avaliacoes);
+                return;
+            }
 
             localStorage.setItem(
                 "impulsoAvaliacoes",

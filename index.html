@@ -29,14 +29,14 @@
             <a href="#sobre">Sobre nós</a>
         </nav>
 
-        <button class="botao-login" id="abrirLogin">
-            Entrar
+        <button class="botao-login" id="abrirLogin" aria-label="Entrar ou criar conta no Impulso MKT">
+            Entrar / Cadastrar
         </button>
 
     </header>
 
     <!-- SISTEMA DE BUSCA -->
-<section class="busca-servicos" id="buscaServicos">
+<section class="busca-servicos oculto" id="buscaServicos">
 
     <h2>🔎 Encontre um serviço</h2>
 
@@ -214,7 +214,9 @@
                 <p>
                     O Impulso MKT conecta trabalhadores, profissionais
                     e empresas com pessoas que estão procurando por
-                    seus serviços.
+                    seus serviços. Em poucos passos, você cria seu
+                    perfil, escolhe um plano e começa a aparecer para
+                    quem precisa do que você faz.
                 </p>
 
                 <div class="botoes-inicio">
@@ -224,9 +226,49 @@
                     </a>
 
                     <a href="#como-funciona" class="botao-secundario">
-                        Como funciona?
+                        Como usar o site
                     </a>
 
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="secao guia-uso" id="guiaUso">
+
+            <h2 class="titulo-secao">
+                Guia rápido de uso
+            </h2>
+
+            <p class="subtitulo">
+                Veja como aproveitar o Impulso MKT em poucos passos.
+            </p>
+
+            <div class="guia-grid">
+
+                <div class="guia-item">
+                    <span class="guia-numero">1</span>
+                    <h3>Crie sua conta</h3>
+                    <p>Clique em "Entrar / Cadastrar" e complete seu cadastro com nome, e-mail e senha.</p>
+                </div>
+
+                <div class="guia-item">
+                    <span class="guia-numero">2</span>
+                    <h3>Escolha um plano</h3>
+                    <p>Selecione o nível de divulgação que melhor atende ao seu perfil: Básico, Destaque ou Premium.</p>
+                </div>
+
+                <div class="guia-item">
+                    <span class="guia-numero">3</span>
+                    <h3>Complete seu perfil</h3>
+                    <p>Adicione dados do seu serviço, categoria, localização e uma boa descrição para atrair clientes.</p>
+                </div>
+
+                <div class="guia-item">
+                    <span class="guia-numero">4</span>
+                    <h3>Busque ou publique</h3>
+                    <p>Use a busca para encontrar profissionais ou publique seus trabalhos para receber mais oportunidades.</p>
                 </div>
 
             </div>
@@ -243,7 +285,7 @@
             </h2>
 
             <p class="subtitulo">
-                Divulgar seu trabalho é simples.
+                Qualquer pessoa pode usar o site: basta seguir os passos abaixo.
             </p>
 
             <div class="passos">
@@ -257,8 +299,8 @@
                     </h3>
 
                     <p>
-                        Cadastre-se gratuitamente no Impulso MKT
-                        para começar.
+                        Acesse o botão de login e cadastre-se para
+                        começar a navegar, anunciar ou contratar serviços.
                     </p>
 
                 </div>
@@ -273,8 +315,8 @@
                     </h3>
 
                     <p>
-                        Escolha o plano que combina com a quantidade
-                        de divulgação que você deseja.
+                        Veja as opções e selecione o plano que melhor
+                        combina com seu objetivo de visibilidade e alcance.
                     </p>
 
                 </div>
@@ -285,12 +327,12 @@
                     <div class="numero">03</div>
 
                     <h3>
-                        Publique seu perfil
+                        Complete seu perfil
                     </h3>
 
                     <p>
-                        Coloque suas informações, serviço, descrição
-                        e contato.
+                        Adicione seu serviço, área de atuação, cidade,
+                        descrição e contatos para ficar mais fácil de ser encontrado.
                     </p>
 
                 </div>
@@ -301,12 +343,12 @@
                     <div class="numero">04</div>
 
                     <h3>
-                        Seja encontrado
+                        Busque ou seja encontrado
                     </h3>
 
                     <p>
-                        Outras pessoas poderão encontrar seu trabalho
-                        através do Impulso MKT.
+                        Use os filtros para encontrar profissionais ou
+                        publique seu trabalho para receber contatos e oportunidades.
                     </p>
 
                 </div>
@@ -1378,7 +1420,7 @@
         class="modal"
         id="modalCompra">
 
-        <div class="modal-caixa">
+        <div class="modal-caixa compra-caixa">
 
             <button
                 class="fechar"
@@ -1387,11 +1429,11 @@
             </button>
 
             <h2>
-                Comprar plano
+                Finalizar compra
             </h2>
 
             <p>
-                Você escolheu:
+                Escolha a forma de pagamento e confirme o Pix para liberar o plano.
             </p>
 
             <div class="compra-info">
@@ -1406,15 +1448,103 @@
 
             </div>
 
+            <div class="metodos-pagamento">
+
+                <label class="opcao-pagamento ativo">
+                    <input type="radio" name="metodoPagamento" value="pix" checked>
+                    <span>📱 Pix</span>
+                </label>
+
+                <label class="opcao-pagamento">
+                    <input type="radio" name="metodoPagamento" value="debito">
+                    <span>💳 Débito</span>
+                </label>
+
+                <label class="opcao-pagamento">
+                    <input type="radio" name="metodoPagamento" value="credito">
+                    <span>💳 Crédito</span>
+                </label>
+
+            </div>
+
+            <div class="bloco-pagamento" id="pagamentoPix">
+                <div class="campo-pagamento">
+                    <label>Chave Pix do Impulso MKT</label>
+                    <input type="text" value="impulso@pix.impulso-mkt" readonly>
+                </div>
+
+                <div class="campo-pagamento">
+                    <label>Nome completo do pagador</label>
+                    <input type="text" id="nomePagador" placeholder="Seu nome completo">
+                </div>
+
+                <div class="campo-pagamento">
+                    <label>CPF / CNPJ do pagador</label>
+                    <input type="text" id="cpfPagador" placeholder="000.000.000-00" maxlength="18">
+                </div>
+
+                <div class="campo-pagamento">
+                    <label>Valor a pagar</label>
+                    <div class="pagamento-detalhe">
+                        <strong>Pagamento:</strong>
+                        <span id="valorPixResumo">R$0,00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bloco-pagamento oculto" id="pagamentoCartao">
+                <div class="campo-pagamento">
+                    <label>Nome no cartão</label>
+                    <input type="text" id="nomeCartao" placeholder="Seu nome completo">
+                </div>
+
+                <div class="campo-pagamento">
+                    <label>Número do cartão</label>
+                    <input type="text" id="numeroCartao" maxlength="19" placeholder="0000 0000 0000 0000">
+                </div>
+
+                <div class="dupla-campo">
+                    <div class="campo-pagamento">
+                        <label>Validade</label>
+                        <input type="text" id="validadeCartao" maxlength="5" placeholder="MM/AA">
+                    </div>
+
+                    <div class="campo-pagamento">
+                        <label>CVV</label>
+                        <input type="text" id="cvvCartao" maxlength="4" placeholder="123">
+                    </div>
+                </div>
+            </div>
+
+            <div class="campo-pagamento confirmacao-pix-box">
+                <label class="checkbox-mercado">
+                    <input type="checkbox" id="confirmarPagamentoPix">
+                    <span>
+                        Confirmo que o pagamento foi realizado via Pix para liberar o plano.
+                    </span>
+                </label>
+            </div>
+
+            <div class="resumo-pagamento">
+                <div>
+                    <span>Plano</span>
+                    <strong id="resumoPlanoCompra">Básico</strong>
+                </div>
+                <div>
+                    <span>Vigência</span>
+                    <strong>1 mês</strong>
+                </div>
+            </div>
+
             <p class="aviso-compra">
-                Esta é uma demonstração. O pagamento real
-                será conectado posteriormente.
+                A ativação do plano acontece somente após a confirmação do pagamento via Pix.
+                O método de cartão é usado como forma complementar de cobrança, mas a liberação final do acesso depende da confirmação do Pix registrado no banco.
             </p>
 
             <button
                 id="confirmarCompra"
                 class="botao-principal">
-                Confirmar compra
+                Confirmar pagamento
             </button>
 
         </div>
@@ -1563,6 +1693,8 @@
 
     <!-- JAVASCRIPT -->
 
+    <script src="banco-dados.js"></script>
+    <script src="sistema-armazenamento.js"></script>
     <script src="01.js"></script>
 
 </body>

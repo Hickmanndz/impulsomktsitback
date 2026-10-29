@@ -111,6 +111,10 @@ nav a:hover {
     transform: translateY(-2px);
 }
 
+.oculto {
+    display: none !important;
+}
+
 .botao-principal {
     display: inline-block;
     padding: 14px 25px;
@@ -228,6 +232,54 @@ nav a:hover {
     padding: 100px 7%;
     max-width: 1250px;
     margin: auto;
+}
+
+.guia-uso {
+    padding-top: 30px;
+}
+
+.guia-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.guia-item {
+    background: #101016;
+    border: 1px solid #20202a;
+    border-radius: 16px;
+    padding: 28px 22px;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.guia-item:hover {
+    border-color: #a45cff;
+    transform: translateY(-5px);
+}
+
+.guia-numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(164, 92, 255, 0.12);
+    color: #d2b5ff;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.guia-item h3 {
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.guia-item p {
+    color: #8d8d99;
+    font-size: 14px;
+    line-height: 1.7;
 }
 
 .titulo-secao {
@@ -631,6 +683,8 @@ nav a:hover {
     width: 100%;
 
     max-width: 430px;
+    max-height: 90vh;
+    overflow-y: auto;
 
     background: #111117;
 
@@ -808,6 +862,13 @@ nav a:hover {
    COMPRA
 ========================= */
 
+.compra-caixa {
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-right: 18px;
+}
+
 .compra-info {
     display: flex;
 
@@ -833,10 +894,135 @@ nav a:hover {
     font-weight: bold;
 }
 
+.metodos-pagamento {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.opcao-pagamento {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #2d2d38;
+    background: #0e0e14;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.opcao-pagamento input {
+    accent-color: #a45cff;
+}
+
+.opcao-pagamento.ativo {
+    border-color: #a45cff;
+    background: rgba(164, 92, 255, 0.08);
+}
+
+.bloco-pagamento {
+    background: #0d0d12;
+    border: 1px solid #2d2d38;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.campo-pagamento {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.campo-pagamento label {
+    font-size: 12px;
+    color: #b9b9c7;
+}
+
+.campo-pagamento input,
+.campo-pagamento select {
+    width: 100%;
+    padding: 12px 13px;
+    border-radius: 8px;
+    border: 1px solid #2d2d38;
+    background: #09090e;
+    color: white;
+    outline: none;
+}
+
+.campo-pagamento input:focus,
+.campo-pagamento select:focus {
+    border-color: #a45cff;
+}
+
+.dupla-campo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.pagamento-detalhe,
+.resumo-pagamento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(164, 92, 255, 0.06);
+    border: 1px solid rgba(164, 92, 255, 0.2);
+    border-radius: 10px;
+    color: #ecdefe;
+}
+
+.confirmacao-pix-box {
+    margin-bottom: 18px;
+}
+
+.checkbox-mercado {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.5;
+    color: #ddddf3;
+}
+
+.checkbox-mercado input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #a45cff;
+}
+
+.resumo-pagamento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 20px;
+}
+
+.resumo-pagamento div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resumo-pagamento span {
+    font-size: 12px;
+    color: #a9a9b5;
+}
+
 .aviso-compra {
     font-size: 12px;
 
     color: #777 !important;
+}
+
+.oculto {
+    display: none !important;
 }
 
 

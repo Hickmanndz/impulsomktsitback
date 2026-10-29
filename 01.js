@@ -85,6 +85,8 @@ const pesquisa =
 const filtroCategoria =
     document.getElementById("filtroCategoria");
 
+const buscaServicos =
+    document.getElementById("buscaServicos");
 
 const areaPosts =
     document.getElementById("areaPosts");
@@ -97,28 +99,111 @@ const semPosts =
    DADOS
 ===================================================== */
 
-let usuarios =
-    JSON.parse(
-        localStorage.getItem(
-            "impulsoUsuarios"
-        )
-    ) || [];
+function obterUsuariosDb() {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.getUsers) {
+        return window.ImpulsoStorage.getUsers();
+    }
+
+    if (window.DB && window.DB.getCollection) {
+        return window.DB.getCollection("usuarios");
+    }
+
+    try {
+        return JSON.parse(localStorage.getItem("impulsoUsuarios") || "[]");
+    } catch (erro) {
+        return [];
+    }
+}
+
+function salvarUsuariosDb(lista) {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.saveUsers) {
+        window.ImpulsoStorage.saveUsers(lista);
+        return true;
+    }
+
+    if (window.DB && window.DB.setCollection) {
+        window.DB.setCollection("usuarios", lista);
+        return true;
+    }
+
+    localStorage.setItem("impulsoUsuarios", JSON.stringify(lista));
+    return true;
+}
+
+function obterPostsDb() {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.getPosts) {
+        return window.ImpulsoStorage.getPosts();
+    }
+
+    if (window.DB && window.DB.getCollection) {
+        return window.DB.getCollection("posts");
+    }
+
+    try {
+        return JSON.parse(localStorage.getItem("impulsoPosts") || "[]");
+    } catch (erro) {
+        return [];
+    }
+}
+
+function salvarPostsDb(lista) {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.savePosts) {
+        window.ImpulsoStorage.savePosts(lista);
+        return true;
+    }
+
+    if (window.DB && window.DB.setCollection) {
+        window.DB.setCollection("posts", lista);
+        return true;
+    }
+
+    localStorage.setItem("impulsoPosts", JSON.stringify(lista));
+    return true;
+}
+
+function obterUsuarioLogadoDb() {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.getCurrentUser) {
+        return window.ImpulsoStorage.getCurrentUser();
+    }
+
+    if (window.DB && window.DB.getUsuarioLogado) {
+        return window.DB.getUsuarioLogado();
+    }
+
+    try {
+        return JSON.parse(localStorage.getItem("impulsoUsuarioLogado") || "null");
+    } catch (erro) {
+        return null;
+    }
+}
+
+function salvarUsuarioLogadoDb(usuario) {
+    if (window.ImpulsoStorage && window.ImpulsoStorage.setCurrentUser) {
+        window.ImpulsoStorage.setCurrentUser(usuario);
+        return true;
+    }
+
+    if (window.DB && window.DB.setUsuarioLogado) {
+        window.DB.setUsuarioLogado(usuario);
+        return true;
+    }
+
+    if (!usuario) {
+        localStorage.removeItem("impulsoUsuarioLogado");
+        return true;
+    }
+
+    localStorage.setItem("impulsoUsuarioLogado", JSON.stringify(usuario));
+    return true;
+}
+
+let usuarios = obterUsuariosDb();
 
 
-let posts =
-    JSON.parse(
-        localStorage.getItem(
-            "impulsoPosts"
-        )
-    ) || [];
+let posts = obterPostsDb();
 
 
-let usuarioLogado =
-    JSON.parse(
-        localStorage.getItem(
-            "impulsoUsuarioLogado"
-        )
-    ) || null;
+let usuarioLogado = obterUsuarioLogadoDb();
 
 
 /* =====================================================
@@ -499,12 +584,19 @@ formLogin.addEventListener(
 
 function salvarUsuarios() {
 
-    localStorage.setItem(
-        "impulsoUsuarios",
-        JSON.stringify(
-            usuarios
-        )
-    );
+    if (window.ImpulsoStorage && window.ImpulsoStorage.saveUsers) {
+        window.ImpulsoStorage.saveUsers(usuarios);
+    } else if (window.DB && window.DB.setCollection) {
+        window.DB.setCollection("usuarios", usuarios);
+    } else {
+        localStorage.setItem(
+            "impulsoUsuarios",
+            JSON.stringify(
+                usuarios
+            )
+        );
+    }
+
     atualizarCategoriasImpulso();
     document.getElementById("filtroCategoria")
     ?.dispatchEvent(new Event("change"));
@@ -514,12 +606,18 @@ function salvarUsuarios() {
 
 function salvarUsuarioLogado() {
 
-    localStorage.setItem(
-        "impulsoUsuarioLogado",
-        JSON.stringify(
-            usuarioLogado
-        )
-    );
+    if (window.ImpulsoStorage && window.ImpulsoStorage.setCurrentUser) {
+        window.ImpulsoStorage.setCurrentUser(usuarioLogado);
+    } else if (window.DB && window.DB.setUsuarioLogado) {
+        window.DB.setUsuarioLogado(usuarioLogado);
+    } else {
+        localStorage.setItem(
+            "impulsoUsuarioLogado",
+            JSON.stringify(
+                usuarioLogado
+            )
+        );
+    }
 
 }
 
@@ -535,10 +633,18 @@ function atualizarInterface() {
         abrirLogin.textContent =
             "Minha conta";
 
+        if (buscaServicos) {
+            buscaServicos.classList.remove("oculto");
+        }
+
     } else {
 
         abrirLogin.textContent =
             "Entrar";
+
+        if (buscaServicos) {
+            buscaServicos.classList.add("oculto");
+        }
 
     }
 
@@ -1548,9 +1654,7 @@ console.log(
 
     function usuarioAtual() {
         try {
-            const usuario = JSON.parse(
-                localStorage.getItem("impulsoUsuarioLogado")
-            );
+            const usuario = obterUsuarioLogadoDb();
 
             return usuario && typeof usuario === "object"
                 ? usuario
@@ -1562,9 +1666,7 @@ console.log(
 
     function salvarUsuario(usuario) {
         try {
-            const lista = JSON.parse(
-                localStorage.getItem("impulsoUsuarios") || "[]"
-            );
+            const lista = obterUsuariosDb();
 
             const indice = lista.findIndex(
                 item => item.email === usuario.email
@@ -1583,15 +1685,8 @@ console.log(
                 ...usuario
             };
 
-            localStorage.setItem(
-                "impulsoUsuarios",
-                JSON.stringify(lista)
-            );
-
-            localStorage.setItem(
-                "impulsoUsuarioLogado",
-                JSON.stringify(usuario)
-            );
+            salvarUsuariosDb(lista);
+            salvarUsuarioLogadoDb(usuario);
 
             return true;
         } catch (erro) {
@@ -1913,7 +2008,7 @@ function fecharModal(id) {
         const confirmar = confirm("Deseja realmente sair da sua conta?");
         if (!confirmar) return;
 
-        localStorage.removeItem("impulsoUsuarioLogado");
+        salvarUsuarioLogadoDb(null);
 
         fecharModal("modalConta");
         fecharModal("modalEditarPerfil");
@@ -1967,9 +2062,8 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
 
     function usuarioAtual() {
         try {
-            return JSON.parse(
-                localStorage.getItem("impulsoUsuarioLogado")
-            );
+            const usuario = obterUsuarioLogadoDb();
+            return usuario && typeof usuario === "object" ? usuario : null;
         } catch {
             return null;
         }
@@ -1977,10 +2071,7 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
 
     function lerPosts() {
         try {
-            const dados = JSON.parse(
-                localStorage.getItem("impulsoPosts") || "[]"
-            );
-
+            const dados = obterPostsDb();
             return Array.isArray(dados) ? dados : [];
         } catch {
             return [];
@@ -1990,10 +2081,11 @@ if (typeof window.atualizarMinhaContaImpulso === "function") {
   
 function salvarPosts(posts) {
     try {
-        localStorage.setItem(
-            "impulsoPosts",
-            JSON.stringify(posts)
-        );
+        const salvou = salvarPostsDb(Array.isArray(posts) ? posts : []);
+
+        if (!salvou) {
+            throw new Error("Falha ao salvar no banco.");
+        }
 
         // Atualiza as categorias assim que os posts forem salvos.
         if (typeof window.atualizarCategoriasImpulso === "function") {
@@ -2016,7 +2108,7 @@ function salvarPosts(posts) {
 
         alert(
             "Não foi possível salvar as publicações. " +
-            "A imagem pode ser grande demais para o armazenamento local."
+            "Verifique o armazenamento do banco e tente novamente."
         );
 
         return false;
@@ -2667,9 +2759,8 @@ const PLANOS_IMPULSO = {
 /* Obtém o usuário conectado */
 function usuarioAtualImpulso() {
     try {
-        return JSON.parse(
-            localStorage.getItem("impulsoUsuarioLogado") || "null"
-        );
+        const usuario = obterUsuarioLogadoDb();
+        return usuario && typeof usuario === "object" ? usuario : null;
     } catch {
         return null;
     }
@@ -2707,9 +2798,7 @@ function configuracaoPlanoImpulso(plano) {
 
 /* Conta os posts de um usuário */
 function contarPostsUsuarioImpulso(email) {
-    const posts = JSON.parse(
-        localStorage.getItem("impulsoPosts") || "[]"
-    );
+    const posts = obterPostsDb();
 
     return posts.filter(post =>
         String(post.email || post.usuarioEmail || post.autorEmail || "")
@@ -2841,9 +2930,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function obterPosts() {
         try {
-            const dados = JSON.parse(
-                localStorage.getItem("impulsoPosts") || "[]"
-            );
+            const dados = obterPostsDb();
 
             return Array.isArray(dados) ? dados : [];
         } catch (erro) {
@@ -3164,9 +3251,8 @@ function filtrar() {
 
     function lerUsuario() {
         try {
-            return JSON.parse(
-                localStorage.getItem("impulsoUsuarioLogado") || "null"
-            );
+            const usuario = obterUsuarioLogadoDb();
+            return usuario && typeof usuario === "object" ? usuario : null;
         } catch {
             return null;
         }
@@ -3174,9 +3260,7 @@ function filtrar() {
 
     function lerPosts() {
         try {
-            const posts = JSON.parse(
-                localStorage.getItem("impulsoPosts") || "[]"
-            );
+            const posts = obterPostsDb();
 
             return Array.isArray(posts) ? posts : [];
         } catch {
@@ -3366,9 +3450,7 @@ function atualizarCategoriasImpulso() {
 
     if (!filtroCategoria) return;
 
-    const posts = JSON.parse(
-        localStorage.getItem("impulsoPosts") || "[]"
-    );
+    const posts = obterPostsDb();
 
     // Guarda a categoria atualmente selecionada
     const categoriaSelecionada = filtroCategoria.value;
