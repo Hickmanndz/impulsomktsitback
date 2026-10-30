@@ -8,6 +8,14 @@
 
     const storage = globalScope.localStorage;
     const db = globalScope.DB || null;
+    const apiBaseUrl = (() => {
+        if (typeof globalScope.location !== 'undefined' && globalScope.location.origin) {
+            return globalScope.location.origin;
+        }
+
+        return 'http://localhost:3000';
+    })();
+    const usaApiRemota = typeof globalScope.fetch === 'function' && (!globalScope.location || globalScope.location.protocol !== 'file:');
 
     function normalizarEmail(email) {
         return String(email || '').trim().toLowerCase();
@@ -41,6 +49,89 @@
         }
     }
 
+    async function carregarViaAPI(chave, padrao) {
+        if (!usaApiRemota) {
+            return padrao;
+        }
+
+        try {
+            const resposta = await fetch(`${apiBaseUrl}/api/collections/${encodeURIComponent(chave)}`);
+            if (!resposta.ok) {
+                return padrao;
+            }
+
+            const dados = await resposta.json();
+            if (Array.isArray(dados)) {
+                salvarJSON(chave, dados);
+                return dados;
+            }
+
+            return padrao;
+        } catch (erro) {
+            return padrao;
+        }
+    }
+
+    async function salvarViaAPI(chave, valor) {
+        if (!usaApiRemota) {
+            return false;
+        }
+
+        try {
+            const resposta = await fetch(`${apiBaseUrl}/api/collections/${encodeURIComponent(chave)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(valor)
+            });
+
+            return resposta.ok;
+        } catch (erro) {
+            console.warn('Erro ao sincronizar com a API:', chave, erro);
+            return false;
+        }
+    }
+
+    async function carregarSessaoViaAPI(chave, padrao) {
+        if (!usaApiRemota) {
+            return padrao;
+        }
+
+        try {
+            const resposta = await fetch(`${apiBaseUrl}/api/session/${encodeURIComponent(chave)}`);
+            if (!resposta.ok) {
+                return padrao;
+            }
+
+            const dados = await resposta.json();
+            if (dados !== null) {
+                salvarJSON(chave, dados);
+            }
+
+            return dados ?? padrao;
+        } catch (erro) {
+            return padrao;
+        }
+    }
+
+    async function salvarSessaoViaAPI(chave, valor) {
+        if (!usaApiRemota) {
+            return false;
+        }
+
+        try {
+            const resposta = await fetch(`${apiBaseUrl}/api/session/${encodeURIComponent(chave)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(valor)
+            });
+
+            return resposta.ok;
+        } catch (erro) {
+            console.warn('Erro ao sincronizar sessão via API:', chave, erro);
+            return false;
+        }
+    }
+
     const ImpulsoStorage = {
         STORAGE_KEYS,
 
@@ -48,6 +139,13 @@
             if (db && db.getCollection) {
                 return db.getCollection('usuarios');
             }
+
+            if (usaApiRemota) {
+                const local = lerJSON(STORAGE_KEYS.usuarios, []);
+                carregarViaAPI(STORAGE_KEYS.usuarios, []).catch(() => {});
+                return local;
+            }
+
             return lerJSON(STORAGE_KEYS.usuarios, []);
         },
 
@@ -56,13 +154,23 @@
                 db.setCollection('usuarios', usuarios);
                 return true;
             }
-            return salvarJSON(STORAGE_KEYS.usuarios, usuarios);
+
+            const salvoLocal = salvarJSON(STORAGE_KEYS.usuarios, usuarios);
+            salvarViaAPI(STORAGE_KEYS.usuarios, usuarios).catch(() => {});
+            return salvoLocal;
         },
 
         getPosts() {
             if (db && db.getCollection) {
                 return db.getCollection('posts');
             }
+
+            if (usaApiRemota) {
+                const local = lerJSON(STORAGE_KEYS.posts, []);
+                carregarViaAPI(STORAGE_KEYS.posts, []).catch(() => {});
+                return local;
+            }
+
             return lerJSON(STORAGE_KEYS.posts, []);
         },
 
@@ -71,13 +179,23 @@
                 db.setCollection('posts', posts);
                 return true;
             }
-            return salvarJSON(STORAGE_KEYS.posts, posts);
+
+            const salvoLocal = salvarJSON(STORAGE_KEYS.posts, posts);
+            salvarViaAPI(STORAGE_KEYS.posts, posts).catch(() => {});
+            return salvoLocal;
         },
 
         getCurrentUser() {
             if (db && db.getUsuarioLogado) {
                 return db.getUsuarioLogado();
             }
+
+            if (usaApiRemota) {
+                const local = lerJSON(STORAGE_KEYS.usuarioLogado, null);
+                carregarSessaoViaAPI(STORAGE_KEYS.usuarioLogado, null).catch(() => {});
+                return local;
+            }
+
             return lerJSON(STORAGE_KEYS.usuarioLogado, null);
         },
 
@@ -85,6 +203,13 @@
             if (db && db.getCollection) {
                 return db.getCollection('pagamentos');
             }
+
+            if (usaApiRemota) {
+                const local = lerJSON(STORAGE_KEYS.pagamentos, []);
+                carregarViaAPI(STORAGE_KEYS.pagamentos, []).catch(() => {});
+                return local;
+            }
+
             return lerJSON(STORAGE_KEYS.pagamentos, []);
         },
 
@@ -93,7 +218,10 @@
                 db.setCollection('pagamentos', pagamentos);
                 return true;
             }
-            return salvarJSON(STORAGE_KEYS.pagamentos, pagamentos);
+
+            const salvoLocal = salvarJSON(STORAGE_KEYS.pagamentos, pagamentos);
+            salvarViaAPI(STORAGE_KEYS.pagamentos, pagamentos).catch(() => {});
+            return salvoLocal;
         },
 
         setCurrentUser(usuario) {
@@ -102,11 +230,16 @@
             }
 
             if (!usuario) {
-                storage.removeItem(STORAGE_KEYS.usuarioLogado);
+                if (storage) {
+                    storage.removeItem(STORAGE_KEYS.usuarioLogado);
+                }
+                salvarSessaoViaAPI(STORAGE_KEYS.usuarioLogado, null).catch(() => {});
                 return true;
             }
 
-            return salvarJSON(STORAGE_KEYS.usuarioLogado, usuario);
+            const salvoLocal = salvarJSON(STORAGE_KEYS.usuarioLogado, usuario);
+            salvarSessaoViaAPI(STORAGE_KEYS.usuarioLogado, usuario).catch(() => {});
+            return salvoLocal;
         },
 
         clearCurrentUser() {

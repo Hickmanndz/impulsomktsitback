@@ -68,28 +68,39 @@
 
         .empresa-container {
             background: #111116;
-            border: 1px solid #29202f;
-            border-radius: 18px;
+            border: 1px solid #2d2336;
+            border-radius: 22px;
             overflow: hidden;
+            box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
         }
 
         /* IMAGEM */
 
         .empresa-imagem {
             width: 100%;
-            height: 350px;
-
+            min-height: 340px;
+            max-height: 560px;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            background: #18151c;
+            padding: 18px 18px 0;
+            background: radial-gradient(circle at top, rgba(164, 92, 255, 0.12), transparent 45%),
+                linear-gradient(180deg, #17141d 0%, #0f0d13 100%);
+            border-bottom: 1px solid #29202f;
+            overflow: hidden;
         }
 
         .empresa-imagem img {
+            display: block;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            max-height: 520px;
+            object-fit: contain;
+            object-position: center;
+            background: #111116;
+            border: 1px solid rgba(164, 92, 255, 0.22);
+            border-radius: 18px;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
         }
 
         .sem-imagem {
@@ -100,48 +111,94 @@
         /* INFORMAÇÕES */
 
         .empresa-conteudo {
-            padding: 35px;
+            padding: 32px 32px 36px;
         }
 
         .empresa-categoria {
             display: inline-block;
-
-            background: #241633;
-            color: #b875ff;
-
-            padding: 7px 13px;
-            border-radius: 20px;
-
+            background: rgba(164, 92, 255, 0.12);
+            color: #d5b5ff;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(164, 92, 255, 0.3);
             font-size: 13px;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+            letter-spacing: 0.04em;
         }
 
         .empresa-titulo {
-            font-size: 36px;
-            margin-bottom: 15px;
+            font-size: clamp(30px, 4vw, 40px);
+            margin-bottom: 16px;
+            line-height: 1.15;
         }
 
         .empresa-descricao {
             color: #c8c8c8;
-            line-height: 1.7;
+            line-height: 1.75;
             font-size: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
+            max-width: 800px;
         }
 
         /* ESTATÍSTICAS */
 
         .empresa-estatisticas {
             display: flex;
-            gap: 25px;
-
+            flex-wrap: wrap;
+            gap: 14px 24px;
             padding: 18px 0;
-
             border-top: 1px solid #29202f;
             border-bottom: 1px solid #29202f;
-
             margin-bottom: 30px;
-
             color: #cfcfcf;
+        }
+
+        .empresa-estatisticas span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .empresa-visitas-mensais {
+            background: #151219;
+            border: 1px solid #29202f;
+            border-radius: 12px;
+            padding: 22px 20px;
+            margin-bottom: 30px;
+        }
+
+        .empresa-visitas-mensais h3 {
+            margin-bottom: 18px;
+            font-size: 20px;
+        }
+
+        .visitas-mes-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+        }
+
+        .visita-mes-item {
+            background: #1a1620;
+            border: 1px solid #312437;
+            border-radius: 10px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .visita-mes-item strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .visita-mes-item span {
+            color: #b9b9bf;
+            font-size: 12px;
         }
 
         /* AVALIAÇÕES */
@@ -439,11 +496,24 @@
         @media (max-width: 700px) {
 
             .empresa-imagem {
-                height: 250px;
+                min-height: 220px;
+                max-height: 330px;
+                padding: 12px 12px 0;
+            }
+
+            .empresa-imagem img {
+                width: 100%;
+                height: 100%;
+                max-height: 330px;
+                border-radius: 12px;
             }
 
             .empresa-conteudo {
-                padding: 22px;
+                padding: 22px 20px 26px;
+            }
+
+            .empresa-estatisticas {
+                gap: 10px;
             }
 
             .empresa-titulo {
@@ -1167,6 +1237,53 @@
                 Number(post.visualizacoes) ||
                 0;
 
+            const visualizacoesPorMes =
+                post.visualizacoesPorMes &&
+                typeof post.visualizacoesPorMes === "object"
+                    ? post.visualizacoesPorMes
+                    : {};
+
+            const mesesOrdenados =
+                Object.entries(visualizacoesPorMes)
+                    .sort(([a], [b]) => a.localeCompare(b))
+                    .slice(-6);
+
+            const visualizacaoMesHTML =
+                mesesOrdenados.length
+                    ? `
+                        <div class="empresa-visitas-mensais">
+                            <h3>📊 Visualizações por mês</h3>
+                            <div class="visitas-mes-lista">
+                                ${mesesOrdenados
+                                    .map(([mes, total]) => {
+                                        const label = new Date(`${mes}-01T00:00:00`).toLocaleDateString("pt-BR", {
+                                            month: "short",
+                                            year: "2-digit"
+                                        });
+
+                                        return `
+                                            <div class="visita-mes-item">
+                                                <strong>${Number(total) || 0}</strong>
+                                                <span>${label}</span>
+                                            </div>
+                                        `;
+                                    })
+                                    .join("")}
+                            </div>
+                        </div>
+                    `
+                    : `
+                        <div class="empresa-visitas-mensais">
+                            <h3>📊 Visualizações por mês</h3>
+                            <div class="visitas-mes-lista">
+                                <div class="visita-mes-item">
+                                    <strong>0</strong>
+                                    <span>Este mês</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
 
             /* ==========================================
                WHATSAPP
@@ -1307,6 +1424,7 @@
 
                         </div>
 
+                        ${visualizacaoMesHTML}
 
                         ${montarAvaliacoesHTML()}
 

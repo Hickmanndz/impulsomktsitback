@@ -630,8 +630,15 @@ function atualizarInterface() {
 
     if (usuarioLogado) {
 
-        abrirLogin.textContent =
-            "Minha conta";
+        const nome = (usuarioLogado.nome || "Usuário").trim();
+        const inicial = nome ? nome.charAt(0).toUpperCase() : "U";
+
+        abrirLogin.innerHTML = `
+            <span class="usuario-header-avatar" style="${usuarioLogado.foto ? `background-image: url('${usuarioLogado.foto}');` : ""}">
+                ${usuarioLogado.foto ? "" : inicial}
+            </span>
+            <span class="usuario-header-nome">${nome}</span>
+        `;
 
         if (buscaServicos) {
             buscaServicos.classList.remove("oculto");
@@ -639,8 +646,7 @@ function atualizarInterface() {
 
     } else {
 
-        abrirLogin.textContent =
-            "Entrar";
+        abrirLogin.innerHTML = "Entrar";
 
         if (buscaServicos) {
             buscaServicos.classList.add("oculto");
@@ -2389,6 +2395,14 @@ function fecharModal(id) {
         postsAtuais[indice].visualizacoes =
             (Number(postsAtuais[indice].visualizacoes) || 0) + 1;
 
+        const mesAtual = new Date().toISOString().slice(0, 7);
+        const historicoMes = postsAtuais[indice].visualizacoesPorMes && typeof postsAtuais[indice].visualizacoesPorMes === "object"
+            ? postsAtuais[indice].visualizacoesPorMes
+            : {};
+
+        historicoMes[mesAtual] = (Number(historicoMes[mesAtual]) || 0) + 1;
+        postsAtuais[indice].visualizacoesPorMes = historicoMes;
+
         if (!salvarPosts(postsAtuais)) return;
 
         // Atualiza o contador na publicação
@@ -3682,14 +3696,28 @@ function verificarConteudoInadequado(formulario) {
 
     let imagemOriginal = null;
 
-    let posicaoX = 0;
-    let posicaoY = 0;
+    function atualizarImagem() {
+        const zoom = Number(zoomFoto.value) || 1;
+        imagemRecorte.style.transform = `translate(-50%, -50%) scale(${zoom})`;
+    }
 
-    let arrastando = false;
+    function prepararImagemRecorte() {
+        if (!imagemRecorte.naturalWidth || !imagemRecorte.naturalHeight) {
+            return;
+        }
 
-    let inicioX = 0;
-    let inicioY = 0;
+        const largura = imagemRecorte.naturalWidth;
+        const altura = imagemRecorte.naturalHeight;
+        const viewportSize = viewport.clientWidth;
+        const escala = Math.max(viewportSize / largura, viewportSize / altura);
 
+        imagemRecorte.style.width = `${Math.round(largura * escala)}px`;
+        imagemRecorte.style.height = `${Math.round(altura * escala)}px`;
+        imagemRecorte.style.left = "50%";
+        imagemRecorte.style.top = "50%";
+        imagemRecorte.style.transform = "translate(-50%, -50%) scale(1)";
+        zoomFoto.value = "1";
+    }
 
     /* =================================================
        ESCOLHER FOTO
@@ -3701,231 +3729,36 @@ function verificarConteudoInadequado(formulario) {
 
         if (!arquivo) return;
 
-
         if (!arquivo.type.startsWith("image/")) {
-
             alert("Escolha uma imagem válida.");
-
             return;
         }
 
-
         const leitor = new FileReader();
 
-
         leitor.onload = function (e) {
-
             imagemOriginal = e.target.result;
-
             imagemRecorte.src = imagemOriginal;
-
-
-            posicaoX = 0;
-            posicaoY = 0;
-
             zoomFoto.value = "1";
 
-
             imagemRecorte.onload = function () {
-
-                ajustarImagemInicial();
-
+                prepararImagemRecorte();
                 atualizarImagem();
-
             };
 
-
             modalRecorte.style.display = "flex";
-
         };
 
-
         leitor.readAsDataURL(arquivo);
-
     });
-
-
-    /* =================================================
-       AJUSTE INICIAL
-    ================================================= */
-
-    function ajustarImagemInicial() {
-
-        const largura =
-            imagemRecorte.naturalWidth;
-
-        const altura =
-            imagemRecorte.naturalHeight;
-
-
-        const tamanhoViewport =
-            viewport.clientWidth;
-
-
-        /*
-         * Faz a menor dimensão da imagem
-         * preencher o círculo.
-         */
-
-        if (largura > altura) {
-
-            imagemRecorte.style.height =
-                tamanhoViewport + "px";
-
-            imagemRecorte.style.width =
-                "auto";
-
-        } else {
-
-            imagemRecorte.style.width =
-                tamanhoViewport + "px";
-
-            imagemRecorte.style.height =
-                "auto";
-        }
-
-
-        centralizarImagem();
-
-    }
-
-
-    function centralizarImagem() {
-
-        const largura =
-            imagemRecorte.getBoundingClientRect().width;
-
-        const altura =
-            imagemRecorte.getBoundingClientRect().height;
-
-
-        posicaoX =
-            (viewport.clientWidth - largura) / 2;
-
-        posicaoY =
-            (viewport.clientHeight - altura) / 2;
-
-    }
-
-
-    /* =================================================
-       ATUALIZAR IMAGEM
-    ================================================= */
-
-    function atualizarImagem() {
-
-        const zoom =
-            Number(zoomFoto.value);
-
-
-        imagemRecorte.style.transform =
-            `translate(${posicaoX}px, ${posicaoY}px) scale(${zoom})`;
-
-    }
-
 
     /* =================================================
        ZOOM
     ================================================= */
 
     zoomFoto.addEventListener("input", function () {
-
         atualizarImagem();
-
     });
-
-
-    /* =================================================
-       ARRASTAR COM MOUSE
-    ================================================= */
-
-    viewport.addEventListener("mousedown", function (event) {
-
-        arrastando = true;
-
-        inicioX = event.clientX - posicaoX;
-        inicioY = event.clientY - posicaoY;
-
-    });
-
-
-    window.addEventListener("mousemove", function (event) {
-
-        if (!arrastando) return;
-
-
-        posicaoX =
-            event.clientX - inicioX;
-
-        posicaoY =
-            event.clientY - inicioY;
-
-
-        atualizarImagem();
-
-    });
-
-
-    window.addEventListener("mouseup", function () {
-
-        arrastando = false;
-
-    });
-
-
-    /* =================================================
-       TOUCH / CELULAR
-    ================================================= */
-
-    viewport.addEventListener(
-        "touchstart",
-        function (event) {
-
-            const toque = event.touches[0];
-
-            arrastando = true;
-
-            inicioX =
-                toque.clientX - posicaoX;
-
-            inicioY =
-                toque.clientY - posicaoY;
-
-        },
-        { passive: true }
-    );
-
-
-    viewport.addEventListener(
-        "touchmove",
-        function (event) {
-
-            if (!arrastando) return;
-
-            const toque = event.touches[0];
-
-            posicaoX =
-                toque.clientX - inicioX;
-
-            posicaoY =
-                toque.clientY - inicioY;
-
-            atualizarImagem();
-
-        },
-        { passive: true }
-    );
-
-
-    viewport.addEventListener(
-        "touchend",
-        function () {
-
-            arrastando = false;
-
-        }
-    );
-
 
     /* =================================================
        SALVAR FOTO
@@ -3934,88 +3767,32 @@ function verificarConteudoInadequado(formulario) {
     salvarRecorte.addEventListener(
         "click",
         function () {
-
-            const tamanho =
-                viewport.clientWidth;
-
-
-            const canvas =
-                document.createElement("canvas");
-
+            const tamanho = 512;
+            const canvas = document.createElement("canvas");
             canvas.width = tamanho;
             canvas.height = tamanho;
 
+            const contexto = canvas.getContext("2d");
+            const zoom = Number(zoomFoto.value) || 1;
+            const imagem = imagemRecorte;
+            const larguraOriginal = imagem.naturalWidth;
+            const alturaOriginal = imagem.naturalHeight;
 
-            const contexto =
-                canvas.getContext("2d");
+            const escalaBase = Math.max(tamanho / larguraOriginal, tamanho / alturaOriginal);
+            const larguraDesenhada = larguraOriginal * escalaBase * zoom;
+            const alturaDesenhada = alturaOriginal * escalaBase * zoom;
+            const x = (tamanho - larguraDesenhada) / 2;
+            const y = (tamanho - alturaDesenhada) / 2;
 
+            contexto.beginPath();
+            contexto.arc(tamanho / 2, tamanho / 2, tamanho / 2, 0, Math.PI * 2);
+            contexto.closePath();
+            contexto.clip();
+            contexto.drawImage(imagem, x, y, larguraDesenhada, alturaDesenhada);
 
-            const zoom =
-                Number(zoomFoto.value);
-
-
-            const imagem =
-                imagemRecorte;
-
-
-            const larguraOriginal =
-                imagem.naturalWidth;
-
-            const alturaOriginal =
-                imagem.naturalHeight;
-
-
-            /*
-             * Descobre o tamanho exibido
-             * antes do zoom.
-             */
-
-            const larguraExibida =
-                imagem.getBoundingClientRect().width / zoom;
-
-            const alturaExibida =
-                imagem.getBoundingClientRect().height / zoom;
-
-
-            const escalaX =
-                larguraOriginal / larguraExibida;
-
-            const escalaY =
-                alturaOriginal / alturaExibida;
-
-
-            const xImagem =
-                posicaoX / zoom;
-
-
-            const yImagem =
-                posicaoY / zoom;
-
-
-            contexto.drawImage(
-                imagem,
-                -xImagem * escalaX,
-                -yImagem * escalaY,
-                larguraOriginal,
-                alturaOriginal,
-                0,
-                0,
-                tamanho,
-                tamanho
-            );
-
-
-            const fotoFinal =
-                canvas.toDataURL(
-                    "image/jpeg",
-                    0.90
-                );
-
-
+            const fotoFinal = canvas.toDataURL("image/jpeg", 0.92);
             salvarFotoPerfil(fotoFinal);
-
             fecharModalRecorte();
-
         }
     );
 
