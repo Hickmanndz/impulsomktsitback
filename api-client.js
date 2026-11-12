@@ -13,7 +13,7 @@
 
     async function request(path, options = {}) {
         if (typeof globalScope.location !== 'undefined' && globalScope.location.protocol === 'file:') {
-            throw new Error('Abra o sistema pelo endereço http://localhost:3000 para acessar sua conta.');
+            throw new Error('Abra o sistema por um servidor local (ex.: http://localhost:3000 ou http://<IP-da-maquina>:3000).');
         }
 
         let response;
@@ -28,7 +28,7 @@
             });
         } catch (erro) {
             if (erro && erro.name === 'TypeError') {
-                throw new Error('Não foi possível conectar ao servidor. Verifique se o sistema está aberto em http://localhost:3000.');
+                throw new Error('Não foi possível conectar ao servidor. Verifique se o sistema está aberto em um endereço local válido, como http://localhost:3000 ou http://<IP-da-maquina>:3000.');
             }
             throw erro;
         }

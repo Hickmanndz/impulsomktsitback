@@ -10,6 +10,7 @@ const {
 } = require('./api/helpers/auth-service');
 
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || '0.0.0.0';
 const ROOT = __dirname;
 const DATA_DIR = process.env.IMPULSO_DATA_DIR
   ? path.resolve(process.env.IMPULSO_DATA_DIR)
@@ -23,7 +24,9 @@ const DEFAULT_DB = {
   users: [],
   posts: [],
   payments: [],
-  sessions: []
+  sessions: [],
+  collections: {},
+  sessionData: {}
 };
 
 function ensureDataDir() {
@@ -60,11 +63,15 @@ function readDb() {
     }
 
     const parsed = JSON.parse(raw);
+    const savedCollections = parsed.collections && typeof parsed.collections === 'object' ? parsed.collections : {};
+    const savedSessionData = parsed.sessionData && typeof parsed.sessionData === 'object' ? parsed.sessionData : {};
     return {
       users: Array.isArray(parsed.users) ? parsed.users : [],
       posts: Array.isArray(parsed.posts) ? parsed.posts : [],
       payments: Array.isArray(parsed.payments) ? parsed.payments : [],
-      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : []
+      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+      collections: savedCollections,
+      sessionData: savedSessionData
     };
   } catch (erro) {
     fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
@@ -302,6 +309,68 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/health') {
     jsonResponse(res, 200, { ok: true, status: 'online' });
+    return;
+  }
+
+  const collectionMatch = pathname.match(/^\/api\/collections\/([^/]+)$/);
+  if (collectionMatch) {
+    const db = readDb();
+    const key = decodeURIComponent(collectionMatch[1]);
+
+    if (req.method === 'GET') {
+      const value = db.collections[key];
+      jsonResponse(res, 200, value ?? []);
+      return;
+    }
+
+    if (req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        if (body === null || typeof body === 'undefined') {
+          delete db.collections[key];
+        } else {
+          db.collections[key] = body;
+        }
+        writeDb(db);
+        jsonResponse(res, 200, { ok: true, key, value: db.collections[key] ?? null });
+      } catch (erro) {
+        jsonResponse(res, 400, { error: erro.message || 'Não foi possível salvar a coleção.' });
+      }
+      return;
+    }
+
+    jsonResponse(res, 405, { error: 'Método não permitido.' });
+    return;
+  }
+
+  const sessionMatch = pathname.match(/^\/api\/session\/([^/]+)$/);
+  if (sessionMatch) {
+    const db = readDb();
+    const key = decodeURIComponent(sessionMatch[1]);
+
+    if (req.method === 'GET') {
+      const value = db.sessionData[key];
+      jsonResponse(res, 200, value ?? null);
+      return;
+    }
+
+    if (req.method === 'POST') {
+      try {
+        const body = await parseBody(req);
+        if (body === null || typeof body === 'undefined') {
+          delete db.sessionData[key];
+        } else {
+          db.sessionData[key] = body;
+        }
+        writeDb(db);
+        jsonResponse(res, 200, { ok: true, key, value: db.sessionData[key] ?? null });
+      } catch (erro) {
+        jsonResponse(res, 400, { error: erro.message || 'Não foi possível salvar a sessão.' });
+      }
+      return;
+    }
+
+    jsonResponse(res, 405, { error: 'Método não permitido.' });
     return;
   }
 
@@ -867,7 +936,8 @@ const server = http.createServer(async (req, res) => {
 
 ensureDefaultAdmin();
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log(`Servidor Impulso MKT rodando em http://localhost:${PORT}`);
+  console.log(`Servidor acessível na rede local em http://${HOST === '0.0.0.0' ? '<IP-da-maquina>' : HOST}:${PORT}`);
   console.log(`Admin padrão: ${DEFAULT_ADMIN_EMAIL}`);
 });

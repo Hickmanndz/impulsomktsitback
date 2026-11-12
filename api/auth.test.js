@@ -87,6 +87,38 @@ after(() => {
   }
 });
 
+test('exposes collection and session sync endpoints used by the front-end storage layer', async () => {
+  const collectionResponse = await fetch(`${baseUrl}/api/collections/impulsoUsuarios`);
+  assert.equal(collectionResponse.status, 200);
+  assert.deepEqual(await collectionResponse.json(), []);
+
+  const writeCollection = await fetch(`${baseUrl}/api/collections/impulsoUsuarios`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify([{ id: 'u1', nome: 'Ana' }])
+  });
+  assert.equal(writeCollection.status, 200);
+
+  const readBackCollection = await fetch(`${baseUrl}/api/collections/impulsoUsuarios`);
+  assert.equal(readBackCollection.status, 200);
+  assert.deepEqual(await readBackCollection.json(), [{ id: 'u1', nome: 'Ana' }]);
+
+  const sessionResponse = await fetch(`${baseUrl}/api/session/impulsoUsuarioLogado`);
+  assert.equal(sessionResponse.status, 200);
+  assert.equal(await sessionResponse.text(), 'null');
+
+  const sessionWrite = await fetch(`${baseUrl}/api/session/impulsoUsuarioLogado`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: 'u1', nome: 'Ana' })
+  });
+  assert.equal(sessionWrite.status, 200);
+
+  const sessionReadBack = await fetch(`${baseUrl}/api/session/impulsoUsuarioLogado`);
+  assert.equal(sessionReadBack.status, 200);
+  assert.deepEqual(await sessionReadBack.json(), { id: 'u1', nome: 'Ana' });
+});
+
 test('registers, authenticates, changes password and invalidates the session on logout', async () => {
   const email = `auth-${process.pid}@example.test`;
   const password = 'first-password-123';
