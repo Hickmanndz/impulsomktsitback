@@ -1,4 +1,4 @@
-const { normalizarEmail, gerarId } = require('../helpers');
+const { normalizarEmail, gerarId, hashPassword } = require('../helpers');
 
 function registerUser({ nome, email, senha }) {
   if (!nome || !email || !senha) {
@@ -17,7 +17,7 @@ function registerUser({ nome, email, senha }) {
     id: gerarId(),
     nome: String(nome).trim(),
     email: emailNormalizado,
-    senha: String(senha),
+    senha: hashPassword(senha),
     plano: null,
     criadoEm: new Date().toISOString()
   };

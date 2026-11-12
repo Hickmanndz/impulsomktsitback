@@ -1,9 +1,19 @@
+const { hashPassword: hashSenhaSegura, normalizeEmail, verifyPassword } = require('./auth-service');
+
 function normalizarEmail(email) {
-  return String(email || '').trim().toLowerCase();
+  return normalizeEmail(email);
 }
 
 function gerarId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-module.exports = { normalizarEmail, gerarId };
+function hashPassword(senha) {
+  return hashSenhaSegura(senha);
+}
+
+function verificarSenha(senha, hash) {
+  return verifyPassword(senha, hash);
+}
+
+module.exports = { normalizarEmail, gerarId, hashPassword, verificarSenha };

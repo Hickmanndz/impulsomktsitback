@@ -269,7 +269,6 @@
                 id: Date.now() + Math.random().toString(16).slice(2),
                 nome: String(nome).trim(),
                 email: emailNormalizado,
-                senha: String(senha),
                 plano: null,
                 criadoEm: new Date().toISOString()
             };

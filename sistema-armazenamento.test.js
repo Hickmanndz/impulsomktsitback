@@ -31,6 +31,8 @@ const usuario2 = ImpulsoStorage.registerUser({
   senha: 'abcdef'
 });
 
+assert.strictEqual(Object.hasOwn(usuario1, 'senha'), false, 'o storage local não deve guardar senhas');
+
 const post = ImpulsoStorage.createPost({
   user: usuario1,
   post: {

@@ -636,6 +636,7 @@
                     type="email"
                     id="loginEmail"
                     placeholder="Digite seu e-mail"
+                    autocomplete="username"
                     required>
 
 
@@ -647,6 +648,7 @@
                     type="password"
                     id="loginSenha"
                     placeholder="Digite sua senha"
+                    autocomplete="current-password"
                     required>
 
 
@@ -706,6 +708,8 @@
                     type="text"
                     id="cadastroNome"
                     placeholder="Seu nome"
+                    maxlength="80"
+                    autocomplete="name"
                     required>
 
 
@@ -717,6 +721,7 @@
                     type="email"
                     id="cadastroEmail"
                     placeholder="Seu e-mail"
+                    autocomplete="email"
                     required>
 
 
@@ -728,6 +733,9 @@
                     type="password"
                     id="cadastroSenha"
                     placeholder="Crie uma senha"
+                    minlength="8"
+                    maxlength="128"
+                    autocomplete="new-password"
                     required>
 
 
@@ -739,6 +747,9 @@
                     type="password"
                     id="cadastroConfirmar"
                     placeholder="Digite a senha novamente"
+                    minlength="8"
+                    maxlength="128"
+                    autocomplete="new-password"
                     required>
 
 
@@ -759,89 +770,36 @@
      MINHA CONTA
 ===================================================== -->
 
-<div class="modal modal-conta" id="modalConta">
-
-    <!-- MODAL DE RECORTE DA FOTO -->
-
+<!-- MODAL DE RECORTE DA FOTO -->
 <div class="modal" id="modalRecorteFoto">
-
     <div class="modal-caixa recorte-caixa">
-
-        <button
-            type="button"
-            class="fechar"
-            id="fecharRecorteFoto"
-        >
-            ×
-        </button>
+        <button type="button" class="fechar" id="fecharRecorteFoto">×</button>
 
         <div class="recorte-cabecalho">
             <h2>Ajustar foto de perfil</h2>
-            <p>
-                Ajuste o zoom para deixar a imagem do jeito que você gosta.
-            </p>
+            <p>Ajuste o zoom e arraste a imagem para posicioná-la.</p>
         </div>
-
 
         <div class="area-recorte">
-
-            <div
-                class="recorte-viewport"
-                id="recorteViewport"
-            >
-
-                <img
-                    id="imagemRecorte"
-                    src=""
-                    alt="Prévia da foto de perfil"
-                >
-
+            <div class="recorte-viewport" id="recorteViewport">
+                <img id="imagemRecorte" src="" alt="Prévia da foto de perfil">
             </div>
-
         </div>
-
 
         <div class="controle-zoom">
-
             <span>−</span>
-
-            <input
-                type="range"
-                id="zoomFoto"
-                min="1"
-                max="3"
-                step="0.01"
-                value="1"
-            >
-
+            <input type="range" id="zoomFoto" min="1" max="3" step="0.01" value="1" aria-label="Zoom da foto">
             <span>+</span>
-
         </div>
-
 
         <div class="recorte-acoes">
-
-            <button
-                type="button"
-                class="botao-secundario"
-                id="cancelarRecorte"
-            >
-                Cancelar
-            </button>
-
-            <button
-                type="button"
-                class="botao-principal"
-                id="salvarRecorte"
-            >
-                Salvar foto
-            </button>
-
+            <button type="button" class="botao-secundario" id="cancelarRecorte">Cancelar</button>
+            <button type="button" class="botao-principal" id="salvarRecorte">Salvar foto</button>
         </div>
-
     </div>
-
 </div>
+
+<div class="modal modal-conta" id="modalConta">
 
     <div class="conta-painel">
 
@@ -911,6 +869,15 @@
                     >
                         Alterar foto
                     </label>
+
+                    <button
+                        type="button"
+                        class="botao-foto"
+                        id="removerFotoPerfil"
+                        hidden
+                    >
+                        Remover foto
+                    </button>
 
                     <input
                         type="file"
@@ -988,7 +955,7 @@
 
                     <div class="informacao-item">
 
-                        <small>Categoria</small>
+                        <small>Profissão</small>
 
                         <strong id="contaCategoria">
                             Não informada
@@ -1231,6 +1198,36 @@
 
             </section>
 
+            <section class="card-conta painel-admin oculto" id="adminPainel">
+                <div class="secao-titulo">
+                    <div>
+                        <span>ADMIN</span>
+                        <h3>Painel administrativo</h3>
+                    </div>
+                    <div class="icone-secao">🛠️</div>
+                </div>
+
+                <div class="lista-recursos" id="adminResumo">
+                    <div class="recurso">
+                        <span>📊</span>
+                        <div>
+                            <strong>Carregando resumo...</strong>
+                            <small>Verificando atividade do sistema.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-usuarios">
+                    <div class="admin-usuarios-cabecalho">
+                        <h4>E-mails cadastrados</h4>
+                        <span id="adminUsuariosTotal">Carregando...</span>
+                    </div>
+                    <ul id="adminUsuariosLista" aria-live="polite">
+                        <li>Carregando cadastros...</li>
+                    </ul>
+                </div>
+            </section>
+
 
 
             <!-- =================================================
@@ -1271,18 +1268,13 @@
             <label for="editarNome">Nome profissional ou empresa</label>
             <input type="text" id="editarNome" maxlength="80" required>
 
-            <label for="editarCategoria">Categoria</label>
-            <select id="editarCategoria" required>
-                <option value="">Selecione uma categoria</option>
-                <option value="Design">Design</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Tecnologia">Tecnologia</option>
-                <option value="Beleza">Beleza</option>
-                <option value="Fotografia">Fotografia</option>
-                <option value="Educação">Educação</option>
-                <option value="Alimentação">Alimentação</option>
-                <option value="Outros">Outros</option>
-            </select>
+            <label for="editarCategoria">Profissão</label>
+            <input
+                type="text"
+                id="editarCategoria"
+                maxlength="60"
+                placeholder="Ex.: eletricista, designer, manicure"
+                required>
 
             <label for="editarDescricao">Descrição</label>
             <textarea id="editarDescricao" maxlength="500" rows="5"
@@ -1612,6 +1604,7 @@
 
     <script src="banco-dados.js"></script>
     <script src="sistema-armazenamento.js"></script>
+    <script src="api-client.js"></script>
     <script src="01.js"></script>
 
 </body>

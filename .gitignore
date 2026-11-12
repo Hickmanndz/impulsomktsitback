@@ -1,0 +1,18 @@
+# Local user data and uploaded profile photos
+data/
+
+# Secrets and environment-specific configuration
+.env
+.env.*
+!.env.example
+
+# Installed dependencies and generated output
+node_modules/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+*.tmp
+*.bak

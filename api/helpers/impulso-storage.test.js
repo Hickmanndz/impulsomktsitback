@@ -17,7 +17,7 @@ global.localStorage = {
   }
 };
 
-const { ImpulsoStorage } = require('./sistema-armazenamento.js');
+const { ImpulsoStorage } = require('./impulso-storage.js');
 
 const usuario1 = ImpulsoStorage.registerUser({
   nome: 'Ana',
@@ -30,6 +30,8 @@ const usuario2 = ImpulsoStorage.registerUser({
   email: 'bruno@email.com',
   senha: 'abcdef'
 });
+
+assert.strictEqual(Object.hasOwn(usuario1, 'senha'), false, 'o storage local não deve guardar senhas');
 
 const post = ImpulsoStorage.createPost({
   user: usuario1,

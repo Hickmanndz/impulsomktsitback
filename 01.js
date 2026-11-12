@@ -205,6 +205,59 @@ let posts = obterPostsDb();
 
 let usuarioLogado = obterUsuarioLogadoDb();
 
+function definirUsuarioLogado(usuario) {
+    usuarioLogado = usuario && usuario.id ? usuario : null;
+
+    if (usuarioLogado) {
+        const indice = usuarios.findIndex((item) => String(item.id) === String(usuarioLogado.id));
+        if (indice >= 0) {
+            usuarios[indice] = usuarioLogado;
+        } else {
+            usuarios.push(usuarioLogado);
+        }
+    }
+
+    salvarUsuarios();
+    salvarUsuarioLogado();
+    salvarUsuarioLogadoDb(usuarioLogado);
+    atualizarInterface();
+
+    if (typeof atualizarConta === "function") {
+        atualizarConta();
+    }
+
+    if (typeof atualizarContaUI === "function") {
+        atualizarContaUI();
+    }
+}
+
+function limparSessaoLocal() {
+    usuarioLogado = null;
+    salvarUsuarioLogadoDb(null);
+    salvarUsuarioLogado();
+    atualizarInterface();
+}
+
+async function sincronizarSessaoImpulso() {
+    if (!window.ImpulsoApi || typeof window.ImpulsoApi.me !== "function") {
+        return;
+    }
+
+    try {
+        const resposta = await window.ImpulsoApi.me();
+        const usuario = resposta && resposta.user ? resposta.user : null;
+
+        if (!usuario) {
+            limparSessaoLocal();
+            return;
+        }
+
+        definirUsuarioLogado(usuario);
+    } catch (erro) {
+        limparSessaoLocal();
+    }
+}
+
 
 /* =====================================================
    CONFIGURAÇÃO DOS PLANOS
@@ -374,7 +427,7 @@ fecharCadastro.addEventListener(
 
 formCadastro.addEventListener(
     "submit",
-    function (evento) {
+    async function (evento) {
 
         evento.preventDefault();
 
@@ -406,10 +459,10 @@ formCadastro.addEventListener(
             .value;
 
 
-        if (senha.length < 4) {
+        if (senha.length < 8) {
 
             alert(
-                "A senha precisa ter pelo menos 4 caracteres."
+                "A senha precisa ter pelo menos 8 caracteres."
             );
 
             return;
@@ -427,75 +480,27 @@ formCadastro.addEventListener(
 
         }
 
+        try {
+            const api = window.ImpulsoApi;
+            if (!api || !api.register) {
+                throw new Error("API indisponível.");
+            }
 
-        const existe =
-            usuarios.find(
-                function (usuario) {
+            const resposta = await api.register({ nome, email, senha });
+            const novoUsuario = resposta.user || { id: Date.now(), nome, email, plano: null };
 
-                    return (
-                        usuario.email ===
-                        email
-                    );
+            usuarios = Array.isArray(usuarios) ? [...usuarios, novoUsuario] : [novoUsuario];
+            salvarUsuarios();
+            usuarioLogado = novoUsuario;
+            salvarUsuarioLogado();
 
-                }
-            );
-
-
-        if (existe) {
-
-            alert(
-                "Este e-mail já está cadastrado."
-            );
-
-            return;
-
+            formCadastro.reset();
+            fecharModal(modalCadastro);
+            atualizarInterface();
+            alert("Conta criada com sucesso!");
+        } catch (erro) {
+            alert(erro.message || "Não foi possível criar a conta.");
         }
-
-
-        const novoUsuario = {
-
-            id: Date.now(),
-
-            nome: nome,
-
-            email: email,
-
-            senha: senha,
-
-            plano: null
-
-        };
-
-
-        usuarios.push(
-            novoUsuario
-        );
-
-
-        salvarUsuarios();
-
-
-        usuarioLogado =
-            novoUsuario;
-
-
-        salvarUsuarioLogado();
-
-
-        formCadastro.reset();
-
-
-        fecharModal(
-            modalCadastro
-        );
-
-
-        atualizarInterface();
-
-
-        alert(
-            "Conta criada com sucesso!"
-        );
 
     }
 );
@@ -507,7 +512,7 @@ formCadastro.addEventListener(
 
 formLogin.addEventListener(
     "submit",
-    function (evento) {
+    async function (evento) {
 
         evento.preventDefault();
 
@@ -525,58 +530,29 @@ formLogin.addEventListener(
             .getElementById("loginSenha")
             .value;
 
+        try {
+            const api = window.ImpulsoApi;
+            if (!api || !api.login) {
+                throw new Error("API indisponível.");
+            }
 
-        const usuario =
-            usuarios.find(
-                function (item) {
+            const resposta = await api.login({ email, senha });
+            const usuario = resposta && resposta.user ? resposta.user : null;
 
-                    return (
-                        item.email ===
-                        email &&
-                        item.senha ===
-                        senha
-                    );
+            if (!usuario) {
+                throw new Error("E-mail ou senha incorretos.");
+            }
 
-                }
-            );
-
-
-        if (!usuario) {
-
-            alert(
-                "E-mail ou senha incorretos."
-            );
-
-            return;
-
+            definirUsuarioLogado(usuario);
+            formLogin.reset();
+            fecharModal(modalLogin);
+            alert("Login realizado com sucesso!");
+        } catch (erro) {
+            alert(erro.message || "E-mail ou senha incorretos.");
         }
-
-
-        usuarioLogado =
-            usuario;
-
-
-        salvarUsuarioLogado();
-
-
-        formLogin.reset();
-
-
-        fecharModal(
-            modalLogin
-        );
-
-
-        atualizarInterface();
-
-
-        alert(
-            "Login realizado com sucesso!"
-        );
 
     }
 );
-
 
 /* =====================================================
    SALVAR
@@ -626,19 +602,155 @@ function salvarUsuarioLogado() {
    INTERFACE
 ===================================================== */
 
+async function atualizarPainelAdmin() {
+    const painel = document.getElementById("adminPainel");
+    const resumo = document.getElementById("adminResumo");
+
+    if (!painel || !resumo) {
+        return;
+    }
+
+    if (!usuarioLogado || !usuarioLogado.isAdmin) {
+        painel.classList.add("oculto");
+        return;
+    }
+
+    painel.classList.remove("oculto");
+
+    try {
+        const api = window.ImpulsoApi;
+        if (!api || !api.getAdminDashboard || !api.getAdminUsers) {
+            resumo.innerHTML = `
+                <div class="recurso">
+                    <span>⚠️</span>
+                    <div>
+                        <strong>API de administração indisponível.</strong>
+                        <small>Verifique a conexão com o backend.</small>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const [dados, dadosUsuarios] = await Promise.all([
+            api.getAdminDashboard(),
+            api.getAdminUsers()
+        ]);
+        const totalUsuarios = Number(dados?.summary?.totalUsuarios || 0);
+        const totalPosts = Number(dados?.summary?.totalPosts || 0);
+        const totalPagamentos = Number(dados?.summary?.totalPagamentos || 0);
+        const pendentes = Number(dados?.summary?.pagamentosPendentes || 0);
+
+        resumo.innerHTML = `
+            <div class="recurso">
+                <span>👥</span>
+                <div>
+                    <strong>${totalUsuarios} usuários</strong>
+                    <small>Cadastros ativos no sistema.</small>
+                </div>
+            </div>
+            <div class="recurso">
+                <span>📢</span>
+                <div>
+                    <strong>${totalPosts} publicações</strong>
+                    <small>Posts publicados pela comunidade.</small>
+                </div>
+            </div>
+            <div class="recurso">
+                <span>💳</span>
+                <div>
+                    <strong>${totalPagamentos} movimentações</strong>
+                    <small>${pendentes} pagamentos pendentes.</small>
+                </div>
+            </div>
+        `;
+
+        const listaUsuarios = document.getElementById("adminUsuariosLista");
+        const totalUsuariosElemento = document.getElementById("adminUsuariosTotal");
+        if (listaUsuarios && totalUsuariosElemento) {
+            const usuarios = Array.isArray(dadosUsuarios?.users) ? dadosUsuarios.users : [];
+            totalUsuariosElemento.textContent = `${usuarios.length} cadastros`;
+            listaUsuarios.replaceChildren();
+
+            usuarios.forEach((usuario) => {
+                const item = document.createElement("li");
+                const nome = document.createElement("strong");
+                const email = document.createElement("span");
+                const dataCadastro = document.createElement("small");
+
+                nome.textContent = usuario.nome || "Usuário";
+                email.textContent = usuario.email || "E-mail não informado";
+                dataCadastro.textContent = usuario.criadoEm
+                    ? new Date(usuario.criadoEm).toLocaleDateString("pt-BR")
+                    : "Data indisponível";
+
+                item.append(nome, email, dataCadastro);
+                listaUsuarios.appendChild(item);
+            });
+        }
+    } catch (erro) {
+        resumo.innerHTML = `
+            <div class="recurso">
+                <span>⚠️</span>
+                <div>
+                    <strong>Erro ao carregar painel.</strong>
+                    <small>${String(erro.message || "Verifique o servidor").slice(0, 90)}</small>
+                </div>
+            </div>
+        `;
+        const listaUsuarios = document.getElementById("adminUsuariosLista");
+        const totalUsuariosElemento = document.getElementById("adminUsuariosTotal");
+        if (listaUsuarios) listaUsuarios.replaceChildren();
+        if (totalUsuariosElemento) totalUsuariosElemento.textContent = "Indisponível";
+    }
+}
+
+function obterFotoPerfilSegura(foto) {
+    return typeof foto === "string"
+        && foto.length <= 700 * 1024
+        && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(foto)
+        ? foto
+        : "";
+}
+
+function atualizarAvatarConta(usuario) {
+    const avatar = document.getElementById("avatarConta");
+    if (!avatar) return;
+
+    avatar.replaceChildren();
+    avatar.style.backgroundImage = "none";
+    const foto = obterFotoPerfilSegura(usuario && usuario.foto);
+
+    if (foto) {
+        const imagemAvatar = document.createElement("img");
+        imagemAvatar.src = foto;
+        imagemAvatar.alt = "Foto de perfil";
+        avatar.appendChild(imagemAvatar);
+        return;
+    }
+
+    avatar.textContent = String((usuario && usuario.nome) || "U").trim().charAt(0).toUpperCase() || "U";
+}
+
 function atualizarInterface() {
 
     if (usuarioLogado) {
 
         const nome = (usuarioLogado.nome || "Usuário").trim();
         const inicial = nome ? nome.charAt(0).toUpperCase() : "U";
+        const avatar = document.createElement("span");
+        const foto = obterFotoPerfilSegura(usuarioLogado.foto);
+        avatar.className = "usuario-header-avatar";
+        if (foto) {
+            avatar.style.backgroundImage = `url("${foto}")`;
+        } else {
+            avatar.textContent = inicial;
+        }
 
-        abrirLogin.innerHTML = `
-            <span class="usuario-header-avatar" style="${usuarioLogado.foto ? `background-image: url('${usuarioLogado.foto}');` : ""}">
-                ${usuarioLogado.foto ? "" : inicial}
-            </span>
-            <span class="usuario-header-nome">${nome}</span>
-        `;
+        const nomeElemento = document.createElement("span");
+        nomeElemento.className = "usuario-header-nome";
+        nomeElemento.textContent = nome;
+        abrirLogin.replaceChildren(avatar, nomeElemento);
 
         if (buscaServicos) {
             buscaServicos.classList.remove("oculto");
@@ -653,6 +765,8 @@ function atualizarInterface() {
         }
 
     }
+
+    atualizarPainelAdmin();
 
 }
 
@@ -690,37 +804,19 @@ function atualizarConta() {
         return;
     }
 
+    const nomeConta = document.getElementById("nomeConta");
+    const emailConta = document.getElementById("emailConta");
+    const avatarConta = document.getElementById("avatarConta");
+    const nomePlano = document.getElementById("nomePlanoAtual");
+    const listaRecursos = document.getElementById("listaRecursos");
 
-    document.getElementById(
-        "nomeConta"
-    ).textContent =
-        usuarioLogado.nome;
+    if (!nomeConta || !emailConta || !avatarConta || !nomePlano || !listaRecursos) {
+        return;
+    }
 
-
-    document.getElementById(
-        "emailConta"
-    ).textContent =
-        usuarioLogado.email;
-
-
-    document.getElementById(
-        "avatarConta"
-    ).textContent =
-        usuarioLogado.nome
-        .charAt(0)
-        .toUpperCase();
-
-
-    const nomePlano =
-        document.getElementById(
-            "nomePlanoAtual"
-        );
-
-
-    const listaRecursos =
-        document.getElementById(
-            "listaRecursos"
-        );
+    nomeConta.textContent = usuarioLogado.nome || "Usuário";
+    emailConta.textContent = usuarioLogado.email || "";
+    atualizarAvatarConta(usuarioLogado);
 
 
     const plano =
@@ -870,27 +966,21 @@ fecharConta.addEventListener(
 
 botaoSair.addEventListener(
     "click",
-    function () {
+    async function () {
 
-        usuarioLogado = null;
+        try {
+            if (window.ImpulsoApi && window.ImpulsoApi.logout) {
+                await window.ImpulsoApi.logout();
+            }
+        } catch (erro) {
+            console.warn("Logout API falhou:", erro);
+        }
 
-
-        localStorage.removeItem(
-            "impulsoUsuarioLogado"
-        );
-
-
-        atualizarInterface();
-
-
-        fecharModal(
-            modalConta
-        );
-
-
-        alert(
-            "Você saiu da conta."
-        );
+        limparSessaoLocal();
+        if (modalConta) {
+            fecharModal(modalConta);
+        }
+        alert("Você saiu da conta.");
 
     }
 );
@@ -1075,7 +1165,7 @@ fecharCompra.addEventListener(
 
 confirmarCompra.addEventListener(
     "click",
-    function () {
+    async function () {
 
         const novoPlano =
             confirmarCompra.dataset.plano;
@@ -1129,52 +1219,52 @@ confirmarCompra.addEventListener(
             }
         }
 
+        try {
+            const api = window.ImpulsoApi;
+            const valor = Number((confirmarCompra.dataset.preco || "0").replace(/[^\d]/g, "")) || 0;
 
-        usuarioLogado.plano =
-            novoPlano;
+            if (api && api.createPayment && api.confirmPayment) {
+                const criado = await api.createPayment({
+                    plano: novoPlano,
+                    valor,
+                    metodo: metodoPagamento,
+                    detalhes: {
+                        origem: 'frontend',
+                        metodoPagamento
+                    }
+                });
 
+                const confirmado = await api.confirmPayment(criado.payment.id, { approved: true });
+                usuarioLogado = confirmado.user || usuarioLogado;
+                usuarioLogado.plano = novoPlano;
 
-        const indice =
-            usuarios.findIndex(
-                function (usuario) {
-
-                    return (
-                        usuario.id ===
-                        usuarioLogado.id
-                    );
-
+                const indice = usuarios.findIndex((usuario) => String(usuario.id) === String(usuarioLogado.id));
+                if (indice !== -1) {
+                    usuarios[indice] = usuarioLogado;
                 }
-            );
 
+                salvarUsuarios();
+                salvarUsuarioLogado();
+                fecharModal(modalCompra);
+                alert("Seu plano agora é " + novoPlano + "! Pagamento confirmado por " + (metodoPagamento === "pix" ? "Pix" : "Cartão") + ".");
+                atualizarConta();
+                return;
+            }
 
-        if (indice !== -1) {
+            usuarioLogado.plano = novoPlano;
+            const indice = usuarios.findIndex((usuario) => String(usuario.id) === String(usuarioLogado.id));
+            if (indice !== -1) {
+                usuarios[indice] = usuarioLogado;
+            }
 
-            usuarios[indice] =
-                usuarioLogado;
-
+            salvarUsuarios();
+            salvarUsuarioLogado();
+            fecharModal(modalCompra);
+            alert("Seu plano agora é " + novoPlano + "! Pagamento confirmado por " + (metodoPagamento === "pix" ? "Pix" : "Cartão") + ".");
+            atualizarConta();
+        } catch (erro) {
+            alert(erro.message || "Não foi possível confirmar o pagamento.");
         }
-
-
-        salvarUsuarios();
-
-        salvarUsuarioLogado();
-
-
-        fecharModal(
-            modalCompra
-        );
-
-
-        alert(
-            "Seu plano agora é " +
-            novoPlano +
-            "! Pagamento confirmado por " +
-            (metodoPagamento === "pix" ? "Pix" : "Cartão") +
-            "."
-        );
-
-
-        atualizarConta();
 
     }
 );
@@ -1701,6 +1791,10 @@ document.addEventListener(
 
 atualizarInterface();
 
+if (window.ImpulsoApi && typeof window.ImpulsoApi.me === "function") {
+    sincronizarSessaoImpulso();
+}
+
 mostrarPosts();
 
 
@@ -1887,19 +1981,12 @@ function fecharModal(id) {
             $("nomePlanoAtual").textContent = plano || "Sem plano";
         }
 
-        const avatar = $("avatarConta");
-
-        if (avatar) {
-            if (usuario.foto) {
-                avatar.style.backgroundImage =
-                    `url("${usuario.foto}")`;
-                avatar.textContent = "";
-            } else {
-                avatar.style.backgroundImage = "none";
-                avatar.textContent =
-                    nome.trim().charAt(0).toUpperCase() || "U";
-            }
+        const botaoRemoverFoto = $("removerFotoPerfil");
+        if (botaoRemoverFoto) {
+            botaoRemoverFoto.hidden = !obterFotoPerfilSegura(usuario.foto);
         }
+
+        atualizarAvatarConta(usuario);
 
         atualizarRecursos(plano);
 
@@ -1922,47 +2009,26 @@ function fecharModal(id) {
         fecharModal("modalConta");
     });
 
-    // FOTO DE PERFIL
-    $("fotoPerfil")?.addEventListener("change", function () {
-        const arquivo = this.files && this.files[0];
-        if (!arquivo) return;
-
-        const usuario = usuarioAtual();
-
-        if (!usuario) {
-            alert("Entre na sua conta primeiro.");
-            this.value = "";
+    $("removerFotoPerfil")?.addEventListener("click", async function () {
+        const api = window.ImpulsoApi;
+        if (!api || typeof api.updateProfilePhoto !== "function") {
+            alert("Serviço de perfil indisponível. Atualize a página e tente novamente.");
             return;
         }
 
-        if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) {
-            alert("Use uma imagem JPG, PNG ou WebP.");
-            this.value = "";
-            return;
-        }
-
-        if (arquivo.size > 700 * 1024) {
-            alert("Escolha uma imagem de até 700 KB.");
-            this.value = "";
-            return;
-        }
-
-        const leitor = new FileReader();
-
-        leitor.onload = function () {
-            usuario.foto = leitor.result;
-
-            if (salvarUsuario(usuario)) {
-                atualizarContaUI();
-                alert("Foto atualizada!");
+        this.disabled = true;
+        try {
+            const resposta = await api.updateProfilePhoto(null);
+            if (!resposta || !resposta.user || !resposta.user.id) {
+                throw new Error("O servidor não confirmou a remoção da foto.");
             }
-        };
-
-        leitor.onerror = function () {
-            alert("Não foi possível abrir essa imagem.");
-        };
-
-        leitor.readAsDataURL(arquivo);
+            definirUsuarioLogado(resposta.user);
+            atualizarContaUI();
+        } catch (erro) {
+            alert(erro.message || "Não foi possível remover a foto.");
+        } finally {
+            this.disabled = false;
+        }
     });
 
     // ABRIR E PREENCHER EDIÇÃO DE PERFIL
@@ -1989,7 +2055,7 @@ function fecharModal(id) {
         abrirModal("modalConta");
     });
 
-    $("formEditarPerfil")?.addEventListener("submit", function (evento) {
+    $("formEditarPerfil")?.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
         const usuario = usuarioAtual();
@@ -2007,22 +2073,34 @@ function fecharModal(id) {
             return;
         }
 
-        usuario.nomeProfissional = nome;
-        usuario.categoria = categoria;
-        usuario.descricao = descricao;
+        try {
+            const api = window.ImpulsoApi;
+            if (!api || typeof api.updateProfile !== "function") {
+                throw new Error("Serviço de perfil indisponível. Atualize a página e tente novamente.");
+            }
 
-        if (!salvarUsuario(usuario)) return;
+            const resposta = await api.updateProfile({
+                nomeProfissional: nome,
+                categoria,
+                descricao
+            });
+            if (!resposta || !resposta.user || !resposta.user.id) {
+                throw new Error("O servidor não confirmou as alterações do perfil.");
+            }
 
-        fecharModal("modalEditarPerfil");
-        atualizarContaUI();
-        abrirModal("modalConta");
-
-        alert("Perfil atualizado com sucesso!");
+            definirUsuarioLogado(resposta.user);
+            fecharModal("modalEditarPerfil");
+            atualizarContaUI();
+            abrirModal("modalConta");
+            alert("Perfil atualizado com sucesso!");
+        } catch (erro) {
+            alert(erro.message || "Não foi possível salvar o perfil.");
+        }
     });
 
     // ALTERAR SENHA
     $("botaoAlterarSenha")?.addEventListener("click", function () {
-        if (!usuarioAtual()) {
+        if (!usuarioLogado || !usuarioLogado.id) {
             alert("Entre na sua conta primeiro.");
             return;
         }
@@ -2037,7 +2115,7 @@ function fecharModal(id) {
         abrirModal("modalConta");
     });
 
-    $("formAlterarSenha")?.addEventListener("submit", function (evento) {
+    $("formAlterarSenha")?.addEventListener("submit", async function (evento) {
         evento.preventDefault();
 
         const usuario = usuarioAtual();
@@ -2050,12 +2128,6 @@ function fecharModal(id) {
         const nova = $("novaSenhaConta").value;
         const confirmar = $("confirmarSenhaConta").value;
 
-        // Compatibilidade com o cadastro demonstrativo atual.
-        if (atual !== usuario.senha) {
-            alert("A senha atual está incorreta.");
-            return;
-        }
-
         if (nova.length < 8) {
             alert("A nova senha deve ter pelo menos 8 caracteres.");
             return;
@@ -2066,15 +2138,25 @@ function fecharModal(id) {
             return;
         }
 
-        usuario.senha = nova;
+        try {
+            const api = window.ImpulsoApi;
+            if (!api || typeof api.changePassword !== "function") {
+                throw new Error("Serviço de conta indisponível. Atualize a página e tente novamente.");
+            }
 
-        if (!salvarUsuario(usuario)) return;
+            const resposta = await api.changePassword({ senhaAtual: atual, novaSenha: nova });
+            if (!resposta || !resposta.user) {
+                throw new Error("Não foi possível confirmar a alteração da senha.");
+            }
 
-        $("formAlterarSenha").reset();
-        fecharModal("modalAlterarSenha");
-        abrirModal("modalConta");
-
-        alert("Senha alterada com sucesso!");
+            definirUsuarioLogado(resposta.user);
+            $("formAlterarSenha").reset();
+            fecharModal("modalAlterarSenha");
+            abrirModal("modalConta");
+            alert("Senha alterada com sucesso!");
+        } catch (erro) {
+            alert(erro.message || "Não foi possível alterar a senha.");
+        }
     });
 
     // MUDAR PLANO
@@ -2093,29 +2175,6 @@ function fecharModal(id) {
     // CRIAR POST E VER POSTS
     // Reutiliza os botões do sistema de publicações existente.
 
-
-    // LOGOUT
-    $("botaoSair")?.addEventListener("click", function () {
-        if (!usuarioAtual()) {
-            fecharModal("modalConta");
-            return;
-        }
-
-        const confirmar = confirm("Deseja realmente sair da sua conta?");
-        if (!confirmar) return;
-
-        salvarUsuarioLogadoDb(null);
-
-        fecharModal("modalConta");
-        fecharModal("modalEditarPerfil");
-        fecharModal("modalAlterarSenha");
-
-        // Atualiza o botão de cabeçalho, se o sistema existente o utiliza.
-        const botao = $("abrirLogin");
-        if (botao) botao.textContent = "Entrar";
-
-        alert("Você saiu da sua conta.");
-    });
 
     // Atualiza os dados ao carregar a página.
     document.addEventListener("DOMContentLoaded", atualizarContaUI);
@@ -3784,210 +3843,215 @@ function verificarConteudoInadequado(formulario) {
     }
 
 
-    let imagemOriginal = null;
+    const tiposImagemPermitidos = ["image/jpeg", "image/png", "image/webp"];
+    const tamanhoMaximoArquivo = 8 * 1024 * 1024;
+    const dimensaoMaxima = 10000;
+    let offsetX = 0;
+    let offsetY = 0;
+    let escalaBaseViewport = 1;
+    let arrasteAtual = null;
+
+    function limitarDeslocamento() {
+        const zoom = Number(zoomFoto.value) || 1;
+        const tamanhoViewport = viewport.clientWidth;
+        const limiteX = Math.max(0, (imagemRecorte.naturalWidth * escalaBaseViewport * zoom - tamanhoViewport) / 2);
+        const limiteY = Math.max(0, (imagemRecorte.naturalHeight * escalaBaseViewport * zoom - tamanhoViewport) / 2);
+        offsetX = Math.max(-limiteX, Math.min(limiteX, offsetX));
+        offsetY = Math.max(-limiteY, Math.min(limiteY, offsetY));
+    }
 
     function atualizarImagem() {
         const zoom = Number(zoomFoto.value) || 1;
+        limitarDeslocamento();
+        imagemRecorte.style.left = `calc(50% + ${offsetX}px)`;
+        imagemRecorte.style.top = `calc(50% + ${offsetY}px)`;
         imagemRecorte.style.transform = `translate(-50%, -50%) scale(${zoom})`;
     }
 
     function prepararImagemRecorte() {
-        if (!imagemRecorte.naturalWidth || !imagemRecorte.naturalHeight) {
-            return;
-        }
-
         const largura = imagemRecorte.naturalWidth;
         const altura = imagemRecorte.naturalHeight;
         const viewportSize = viewport.clientWidth;
-        const escala = Math.max(viewportSize / largura, viewportSize / altura);
 
-        imagemRecorte.style.width = `${Math.round(largura * escala)}px`;
-        imagemRecorte.style.height = `${Math.round(altura * escala)}px`;
-        imagemRecorte.style.left = "50%";
-        imagemRecorte.style.top = "50%";
-        imagemRecorte.style.transform = "translate(-50%, -50%) scale(1)";
+        if (!largura || !altura || largura > dimensaoMaxima || altura > dimensaoMaxima || !viewportSize) {
+            alert("Não foi possível abrir essa imagem. Escolha uma imagem menor e tente novamente.");
+            fecharModalRecorte();
+            return false;
+        }
+
+        escalaBaseViewport = Math.max(viewportSize / largura, viewportSize / altura);
+        imagemRecorte.style.width = `${Math.round(largura * escalaBaseViewport)}px`;
+        imagemRecorte.style.height = `${Math.round(altura * escalaBaseViewport)}px`;
+        offsetX = 0;
+        offsetY = 0;
         zoomFoto.value = "1";
+        atualizarImagem();
+        return true;
     }
 
-    /* =================================================
-       ESCOLHER FOTO
-    ================================================= */
+    function fecharModalRecorte() {
+        modalRecorte.classList.remove("ativo");
+        modalRecorte.style.display = "none";
+        imagemRecorte.removeAttribute("src");
+        imagemRecorte.onload = null;
+        imagemRecorte.onerror = null;
+        fotoPerfil.value = "";
+        arrasteAtual = null;
+    }
 
     fotoPerfil.addEventListener("change", function (event) {
-
-        const arquivo = event.target.files[0];
-
+        const arquivo = event.target.files && event.target.files[0];
         if (!arquivo) return;
 
-        if (!arquivo.type.startsWith("image/")) {
-            alert("Escolha uma imagem válida.");
+        if (!usuarioLogado || !usuarioLogado.id) {
+            alert("Entre na sua conta primeiro.");
+            fecharModalRecorte();
+            return;
+        }
+
+        if (!tiposImagemPermitidos.includes(arquivo.type)) {
+            alert("Use uma imagem JPG, PNG ou WebP.");
+            fecharModalRecorte();
+            return;
+        }
+
+        if (arquivo.size > tamanhoMaximoArquivo) {
+            alert("Escolha uma imagem de até 8 MB.");
+            fecharModalRecorte();
             return;
         }
 
         const leitor = new FileReader();
-
-        leitor.onload = function (e) {
-            imagemOriginal = e.target.result;
-            imagemRecorte.src = imagemOriginal;
-            zoomFoto.value = "1";
-
+        leitor.onload = function () {
+            modalRecorte.classList.add("ativo");
+            modalRecorte.style.display = "flex";
             imagemRecorte.onload = function () {
                 prepararImagemRecorte();
-                atualizarImagem();
             };
-
-            modalRecorte.style.display = "flex";
+            imagemRecorte.onerror = function () {
+                alert("O arquivo selecionado não contém uma imagem legível.");
+                fecharModalRecorte();
+            };
+            imagemRecorte.src = String(leitor.result || "");
         };
-
+        leitor.onerror = function () {
+            alert("Não foi possível ler o arquivo selecionado.");
+            fecharModalRecorte();
+        };
         leitor.readAsDataURL(arquivo);
     });
 
-    /* =================================================
-       ZOOM
-    ================================================= */
+    zoomFoto.addEventListener("input", atualizarImagem);
 
-    zoomFoto.addEventListener("input", function () {
+    viewport.addEventListener("pointerdown", function (event) {
+        if (!imagemRecorte.naturalWidth) return;
+        event.preventDefault();
+        arrasteAtual = { x: event.clientX, y: event.clientY, offsetX, offsetY };
+        viewport.setPointerCapture(event.pointerId);
+        viewport.classList.add("arrastando");
+    });
+
+    viewport.addEventListener("pointermove", function (event) {
+        if (!arrasteAtual) return;
+        offsetX = arrasteAtual.offsetX + event.clientX - arrasteAtual.x;
+        offsetY = arrasteAtual.offsetY + event.clientY - arrasteAtual.y;
         atualizarImagem();
     });
 
-    /* =================================================
-       SALVAR FOTO
-    ================================================= */
+    function finalizarArraste() {
+        arrasteAtual = null;
+        viewport.classList.remove("arrastando");
+    }
 
-    salvarRecorte.addEventListener(
-        "click",
-        function () {
-            const tamanho = 512;
-            const canvas = document.createElement("canvas");
-            canvas.width = tamanho;
-            canvas.height = tamanho;
+    viewport.addEventListener("pointerup", finalizarArraste);
+    viewport.addEventListener("pointercancel", finalizarArraste);
 
-            const contexto = canvas.getContext("2d");
-            const zoom = Number(zoomFoto.value) || 1;
-            const imagem = imagemRecorte;
-            const larguraOriginal = imagem.naturalWidth;
-            const alturaOriginal = imagem.naturalHeight;
+    salvarRecorte.addEventListener("click", async function () {
+        if (!imagemRecorte.naturalWidth || !imagemRecorte.naturalHeight) {
+            alert("Escolha uma imagem antes de salvar.");
+            return;
+        }
 
-            const escalaBase = Math.max(tamanho / larguraOriginal, tamanho / alturaOriginal);
-            const larguraDesenhada = larguraOriginal * escalaBase * zoom;
-            const alturaDesenhada = alturaOriginal * escalaBase * zoom;
-            const x = (tamanho - larguraDesenhada) / 2;
-            const y = (tamanho - alturaDesenhada) / 2;
+        const tamanho = 512;
+        const canvas = document.createElement("canvas");
+        canvas.width = tamanho;
+        canvas.height = tamanho;
+        const contexto = canvas.getContext("2d");
+        if (!contexto) {
+            alert("Seu navegador não conseguiu preparar a foto.");
+            return;
+        }
 
+        const zoom = Number(zoomFoto.value) || 1;
+        const escalaBase = Math.max(tamanho / imagemRecorte.naturalWidth, tamanho / imagemRecorte.naturalHeight);
+        const escalaDeslocamento = tamanho / viewport.clientWidth;
+        const largura = imagemRecorte.naturalWidth * escalaBase * zoom;
+        const altura = imagemRecorte.naturalHeight * escalaBase * zoom;
+        const x = (tamanho - largura) / 2 + offsetX * escalaDeslocamento;
+        const y = (tamanho - altura) / 2 + offsetY * escalaDeslocamento;
+
+        try {
             contexto.beginPath();
             contexto.arc(tamanho / 2, tamanho / 2, tamanho / 2, 0, Math.PI * 2);
-            contexto.closePath();
             contexto.clip();
-            contexto.drawImage(imagem, x, y, larguraDesenhada, alturaDesenhada);
+            contexto.drawImage(imagemRecorte, x, y, largura, altura);
 
-            const fotoFinal = canvas.toDataURL("image/jpeg", 0.92);
-            salvarFotoPerfil(fotoFinal);
+            let foto = canvas.toDataURL("image/jpeg", 0.86);
+            const tamanhoMaximoBytes = 512 * 1024;
+            const tamanhoFotoEmBytes = valor => Math.floor((valor.length - "data:image/jpeg;base64,".length) * 3 / 4);
+            if (tamanhoFotoEmBytes(foto) > tamanhoMaximoBytes) {
+                foto = canvas.toDataURL("image/jpeg", 0.68);
+            }
+            if (tamanhoFotoEmBytes(foto) > tamanhoMaximoBytes) {
+                throw new Error("A foto ficou muito grande. Escolha outra imagem e tente novamente.");
+            }
+
+            await salvarFotoPerfil(foto);
+        } catch (erro) {
+            alert(erro.message || "Não foi possível preparar a foto.");
+        }
+    });
+
+    async function salvarFotoPerfil(foto) {
+        salvarRecorte.disabled = true;
+        salvarRecorte.textContent = "Salvando...";
+
+        try {
+            const api = window.ImpulsoApi;
+            if (!api || typeof api.updateProfilePhoto !== "function") {
+                throw new Error("Serviço de perfil indisponível. Atualize a página e tente novamente.");
+            }
+
+            const resposta = await api.updateProfilePhoto(foto);
+            if (!resposta || !resposta.user || !resposta.user.id) {
+                throw new Error("O servidor não confirmou a foto de perfil.");
+            }
+
+            definirUsuarioLogado(resposta.user);
+            fecharModalRecorte();
+            if (typeof window.atualizarMinhaContaImpulso === "function") {
+                window.atualizarMinhaContaImpulso();
+            }
+            alert("Foto de perfil atualizada!");
+        } catch (erro) {
+            alert(erro.message || "Não foi possível salvar a foto.");
+        } finally {
+            salvarRecorte.disabled = false;
+            salvarRecorte.textContent = "Salvar foto";
+        }
+    }
+
+    fecharRecorte.addEventListener("click", fecharModalRecorte);
+    cancelarRecorte.addEventListener("click", fecharModalRecorte);
+    modalRecorte.addEventListener("click", function (event) {
+        if (event.target === modalRecorte) fecharModalRecorte();
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && (modalRecorte.classList.contains("ativo") || fotoPerfil.value)) {
             fecharModalRecorte();
         }
-    );
-
-
-    /* =================================================
-       SALVAR NO PERFIL
-    ================================================= */
-
-    function salvarFotoPerfil(foto) {
-
-        const avatar =
-            document.getElementById("avatarConta");
-
-
-        if (avatar) {
-
-            avatar.innerHTML =
-                `<img src="${foto}" alt="Foto de perfil">`;
-
-        }
-
-
-        /*
-         * Salva temporariamente no usuário logado.
-         */
-
-        const usuario =
-            JSON.parse(
-                localStorage.getItem(
-                    "impulsoUsuarioLogado"
-                )
-            );
-
-
-        if (!usuario) return;
-
-
-        usuario.fotoPerfil = foto;
-
-
-        localStorage.setItem(
-            "impulsoUsuarioLogado",
-            JSON.stringify(usuario)
-        );
-
-
-        /*
-         * Atualiza também o cadastro
-         * do usuário.
-         */
-
-        const usuarios =
-            JSON.parse(
-                localStorage.getItem(
-                    "impulsoUsuarios"
-                )
-            ) || [];
-
-
-        const indice =
-            usuarios.findIndex(
-                item =>
-                    String(item.id) ===
-                    String(usuario.id)
-            );
-
-
-        if (indice !== -1) {
-
-            usuarios[indice].fotoPerfil =
-                foto;
-
-            localStorage.setItem(
-                "impulsoUsuarios",
-                JSON.stringify(usuarios)
-            );
-
-        }
-
-    }
-
-
-    /* =================================================
-       FECHAR
-    ================================================= */
-
-    function fecharModalRecorte() {
-
-        modalRecorte.style.display = "none";
-
-        fotoPerfil.value = "";
-
-    }
-
-
-    fecharRecorte.addEventListener(
-        "click",
-        fecharModalRecorte
-    );
-
-
-    cancelarRecorte.addEventListener(
-        "click",
-        fecharModalRecorte
-    );
+    });
 
 
 })();
