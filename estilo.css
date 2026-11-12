@@ -846,9 +846,12 @@ nav a:hover {
 .avatar-conta {
     width: 80px;
     height: 80px;
+    min-width: 80px;
 
     margin: 0 auto 15px;
 
+    position: relative;
+    flex-shrink: 0;
     border-radius: 50%;
 
     display: flex;
@@ -862,6 +865,9 @@ nav a:hover {
             #a45cff,
             #551f82
         );
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
 
     font-size: 25px;
 
@@ -1546,6 +1552,7 @@ footer p {
 .avatar-conta {
     width: 100px;
     height: 100px;
+    min-width: 100px;
     margin: 0 auto 15px;
     display: flex;
     align-items: center;
@@ -1556,6 +1563,7 @@ footer p {
     background: linear-gradient(135deg, #a45cff, #501d7d);
     background-position: center;
     background-size: cover;
+    background-repeat: no-repeat;
     color: white;
     font-size: 36px;
     font-weight: bold;
@@ -3072,6 +3080,7 @@ footer p {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
 }
 

@@ -1000,6 +1000,60 @@ botoesPlanos.forEach(
 
 
 /* =====================================================
+   MÉTODOS DE PAGAMENTO
+===================================================== */
+
+(function () {
+    const opcoesPagamento = document.querySelectorAll('input[name="metodoPagamento"]');
+    const blocosPagamento = {
+        pix: document.getElementById("pagamentoPix"),
+        cartao: document.getElementById("pagamentoCartao")
+    };
+    const confirmacaoPix = document.getElementById("confirmarPagamentoPix");
+    const confirmacaoPixBox = document.querySelector(".confirmacao-pix-box");
+
+    if (!opcoesPagamento.length) {
+        return;
+    }
+
+    function atualizarMetodoPagamento(metodo) {
+        const valor = metodo || "pix";
+        const opcaoAtiva = document.querySelector(
+            `.opcao-pagamento input[value="${valor}"]`
+        )?.closest(".opcao-pagamento");
+
+        document.querySelectorAll(".opcao-pagamento").forEach((label) => {
+            label.classList.toggle("ativo", label === opcaoAtiva);
+        });
+
+        if (blocosPagamento.pix) {
+            blocosPagamento.pix.classList.toggle("oculto", valor !== "pix");
+        }
+
+        if (blocosPagamento.cartao) {
+            blocosPagamento.cartao.classList.toggle("oculto", valor === "pix");
+        }
+
+        if (confirmacaoPixBox) {
+            confirmacaoPixBox.style.display = valor === "pix" ? "block" : "none";
+        }
+
+        if (confirmacaoPix && valor !== "pix") {
+            confirmacaoPix.checked = false;
+        }
+    }
+
+    opcoesPagamento.forEach((input) => {
+        input.addEventListener("change", function () {
+            atualizarMetodoPagamento(this.value);
+        });
+    });
+
+    atualizarMetodoPagamento("pix");
+})();
+
+
+/* =====================================================
    FECHAR COMPRA
 ===================================================== */
 
@@ -1026,6 +1080,9 @@ confirmarCompra.addEventListener(
         const novoPlano =
             confirmarCompra.dataset.plano;
 
+        const metodoPagamento =
+            document.querySelector('input[name="metodoPagamento"]:checked')?.value || "pix";
+
 
         if (!usuarioLogado) {
 
@@ -1039,6 +1096,37 @@ confirmarCompra.addEventListener(
 
             return;
 
+        }
+
+        if (metodoPagamento === "pix") {
+            const nomePagador = document.getElementById("nomePagador");
+            const cpfPagador = document.getElementById("cpfPagador");
+            const pagamentoConfirmado = document.getElementById("confirmarPagamentoPix");
+
+            if (!nomePagador || !cpfPagador || !pagamentoConfirmado) {
+                alert("Preencha os dados do Pix antes de confirmar.");
+                return;
+            }
+
+            if (!nomePagador.value.trim() || !cpfPagador.value.trim() || !pagamentoConfirmado.checked) {
+                alert("Informe seu nome, CPF e confirme o pagamento via Pix.");
+                return;
+            }
+        } else {
+            const nomeCartao = document.getElementById("nomeCartao");
+            const numeroCartao = document.getElementById("numeroCartao");
+            const validadeCartao = document.getElementById("validadeCartao");
+            const cvvCartao = document.getElementById("cvvCartao");
+
+            if (!nomeCartao || !numeroCartao || !validadeCartao || !cvvCartao) {
+                alert("Preencha os dados do cartão antes de confirmar.");
+                return;
+            }
+
+            if (!nomeCartao.value.trim() || !numeroCartao.value.trim() || !validadeCartao.value.trim() || !cvvCartao.value.trim()) {
+                alert("Informe corretamente os dados de débito ou crédito.");
+                return;
+            }
         }
 
 
@@ -1080,7 +1168,9 @@ confirmarCompra.addEventListener(
         alert(
             "Seu plano agora é " +
             novoPlano +
-            "!"
+            "! Pagamento confirmado por " +
+            (metodoPagamento === "pix" ? "Pix" : "Cartão") +
+            "."
         );
 
 
