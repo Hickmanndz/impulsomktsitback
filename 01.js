@@ -267,7 +267,7 @@ const planos = {
 
     "Básico": {
 
-        preco: 10,
+        preco: 60,
 
         limitePosts: 3,
 
@@ -287,7 +287,7 @@ const planos = {
 
     "Destaque": {
 
-        preco: 20,
+        preco: 120,
 
         limitePosts: 10,
 
@@ -307,7 +307,7 @@ const planos = {
 
     "Premium": {
 
-        preco: 40,
+        preco: 220,
 
         limitePosts: Infinity,
 

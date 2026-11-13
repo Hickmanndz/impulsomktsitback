@@ -4,7 +4,8 @@
         usuarios: [],
         posts: [],
         usuarioLogado: null,
-        pagamentos: []
+        pagamentos: [],
+        avaliacoes: []
     };
 
     function getStorage() {
@@ -34,7 +35,8 @@
                 usuarios: Array.isArray(parsed.usuarios) ? parsed.usuarios : [],
                 posts: Array.isArray(parsed.posts) ? parsed.posts : [],
                 usuarioLogado: parsed.usuarioLogado || null,
-                pagamentos: Array.isArray(parsed.pagamentos) ? parsed.pagamentos : []
+                pagamentos: Array.isArray(parsed.pagamentos) ? parsed.pagamentos : [],
+                avaliacoes: Array.isArray(parsed.avaliacoes) ? parsed.avaliacoes : []
             };
         } catch (erro) {
             console.warn('Erro ao ler banco local:', erro);
@@ -116,6 +118,10 @@
 
         if (nome === 'impulsoPagamentos') {
             return { tipo: 'colecao', nomeColecao: 'pagamentos' };
+        }
+
+        if (nome === 'impulsoAvaliacoes') {
+            return { tipo: 'colecao', nomeColecao: 'avaliacoes' };
         }
 
         if (nome === 'impulsoUsuarioLogado') {

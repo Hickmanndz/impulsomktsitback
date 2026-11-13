@@ -3,7 +3,8 @@
         usuarios: 'impulsoUsuarios',
         posts: 'impulsoPosts',
         usuarioLogado: 'impulsoUsuarioLogado',
-        pagamentos: 'impulsoPagamentos'
+        pagamentos: 'impulsoPagamentos',
+        avaliacoes: 'impulsoAvaliacoes'
     };
 
     const storage = globalScope.localStorage;
@@ -182,6 +183,31 @@
 
             const salvoLocal = salvarJSON(STORAGE_KEYS.posts, posts);
             salvarViaAPI(STORAGE_KEYS.posts, posts).catch(() => {});
+            return salvoLocal;
+        },
+
+        getAvaliacoes() {
+            if (db && db.getCollection) {
+                return db.getCollection('avaliacoes');
+            }
+
+            if (usaApiRemota) {
+                const local = lerJSON(STORAGE_KEYS.avaliacoes, []);
+                carregarViaAPI(STORAGE_KEYS.avaliacoes, []).catch(() => {});
+                return local;
+            }
+
+            return lerJSON(STORAGE_KEYS.avaliacoes, []);
+        },
+
+        saveAvaliacoes(avaliacoes) {
+            if (db && db.setCollection) {
+                db.setCollection('avaliacoes', avaliacoes);
+                return true;
+            }
+
+            const salvoLocal = salvarJSON(STORAGE_KEYS.avaliacoes, avaliacoes);
+            salvarViaAPI(STORAGE_KEYS.avaliacoes, avaliacoes).catch(() => {});
             return salvoLocal;
         },
 

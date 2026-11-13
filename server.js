@@ -377,7 +377,7 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/plans') {
     const planos = {
       Basico: {
-        preco: 10,
+        preco: 60,
         limitePosts: 3,
         destaque: false,
         prioridade: false,
@@ -386,7 +386,7 @@ const server = http.createServer(async (req, res) => {
         descricao: 'Plano inicial para começar sua divulgação.'
       },
       Destaque: {
-        preco: 20,
+        preco: 120,
         limitePosts: 10,
         destaque: true,
         prioridade: true,
@@ -395,7 +395,7 @@ const server = http.createServer(async (req, res) => {
         descricao: 'Mais visibilidade e prioridade.'
       },
       Premium: {
-        preco: 40,
+        preco: 220,
         limitePosts: Infinity,
         destaque: true,
         prioridade: true,

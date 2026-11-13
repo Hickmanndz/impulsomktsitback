@@ -627,9 +627,9 @@
         function lerAvaliacoes() {
 
             try {
-                if (window.ImpulsoStorage && window.ImpulsoStorage.getPagamentos) {
-                    const pagamentos = window.ImpulsoStorage.getPagamentos();
-                    return Array.isArray(pagamentos) ? pagamentos : [];
+                if (window.ImpulsoStorage && window.ImpulsoStorage.getAvaliacoes) {
+                    const avaliacoes = window.ImpulsoStorage.getAvaliacoes();
+                    return Array.isArray(avaliacoes) ? avaliacoes : [];
                 }
 
                 if (window.DB && window.DB.getCollection) {
@@ -653,6 +653,11 @@
 
 
         function salvarAvaliacoes(avaliacoes) {
+
+            if (window.ImpulsoStorage && window.ImpulsoStorage.saveAvaliacoes) {
+                window.ImpulsoStorage.saveAvaliacoes(avaliacoes);
+                return;
+            }
 
             if (window.DB && window.DB.setCollection) {
                 window.DB.setCollection("avaliacoes", avaliacoes);

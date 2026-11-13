@@ -64,4 +64,20 @@ assert.strictEqual(confirmacao.status, 'confirmado', 'pagamento por pix precisa 
 assert.ok(confirmacao.planoValidoAte, 'deve existir data de expiração do plano');
 assert.strictEqual(ImpulsoStorage.podeAutorizarCompra({ user: usuario1, pagamento: confirmacao }), true, 'pagamento confirmado autoriza a compra');
 
+const avaliacoesIniciais = ImpulsoStorage.getAvaliacoes();
+assert.deepStrictEqual(avaliacoesIniciais, [], 'a lista de avaliações deve iniciar vazia');
+
+const avaliacao = {
+  id: 'ava-1',
+  postId: 'post-1',
+  nome: 'Cliente',
+  nota: 5,
+  comentario: 'Excelente atendimento',
+  criadoEm: new Date().toISOString()
+};
+
+ImpulsoStorage.saveAvaliacoes([...avaliacoesIniciais, avaliacao]);
+assert.strictEqual(ImpulsoStorage.getAvaliacoes().length, 1, 'a avaliação deve ser salva');
+assert.deepStrictEqual(ImpulsoStorage.getAvaliacoes()[0], avaliacao, 'a avaliação salva deve ser a mesma');
+
 console.log('storage ok');
